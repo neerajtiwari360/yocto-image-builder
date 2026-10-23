@@ -1,6 +1,6 @@
 # Custom Yocto layers
-
-Place authored project layers here once the Yocto release is selected.
-See ../../docs/project-structure.md for the planned meta-product and optional meta-product-bsp layout.
-This directory is not itself a Yocto layer. It has no conf/layer.conf and must not be added to BBLAYERS.
-Keep third-party repositories pinned under /work/layers/<release>/.
+meta-product/ is an initialized Scarthgap layer containing product-minimal.
+This parent directory is not itself a layer and must not be added to BBLAYERS.
+Third-party BSP repositories live under /work/layers/<release>/.
+The build helper copies authored metadata to /work/project-layers/meta-product on Linux storage.
+Edit the Windows source in this project, not the generated Linux copy.

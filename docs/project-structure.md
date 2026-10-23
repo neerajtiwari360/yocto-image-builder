@@ -102,5 +102,7 @@ A separate Docker container image for every physical device is unnecessary.
 
 ## Current boundary
 
-Docker foundations are validated. No Yocto layer is initialized and no target is buildable yet.
-Board selection, release pinning, image contents, automated target builds and release publishing remain future work.
+Docker foundations are validated. meta-product and rpi-zero2w-minimal are now configured for Scarthgap; see rpi-zero2w-minimal.md for the active target.
+The active board is Raspberry Pi Zero 2 W, using pinned source revisions and a minimal console recipe. Release publishing and other board targets remain future work.
+
+For the first target, the Windows project is mounted read-only at /project. Its authored layer is synchronized to /work/project-layers/meta-product. Target settings are included read-only; all compilation and generated output stay on Linux storage. The /work/project checkout described above remains a future option.

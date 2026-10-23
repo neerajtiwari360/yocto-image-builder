@@ -1,6 +1,5 @@
 # Named build targets
-
-A future target selects the pinned release/layers, MACHINE, DISTRO and image recipe.
-Keep one definition per supported combination; reuse common configuration.
-No executable target definitions exist yet. Choose the configuration tool with the first Yocto release.
-See ../../docs/project-structure.md.
+rpi-zero2w-minimal/ is the first configured target: Pi Zero 2 W, 32-bit, Yocto Scarthgap.
+sources.conf locks upstream commits; local.conf selects the machine and resource limits.
+Run it using scripts/rpi-zero2w.sh. See docs/rpi-zero2w-minimal.md.
+Each additional supported combination should have its own target directory and build directory.

@@ -57,4 +57,6 @@ Many physical devices of the same model can use the same image; give each its ow
 Keep each target's build directory separate. Reuse compatible download and sstate caches.
 
 Read docs/project-structure.md before adding a target.
-No Yocto release, machine or image is configured yet. The yocto/ directories are documented placeholders, not a runnable build system.
+The first configured target is rpi-zero2w-minimal: a small 32-bit console OS for Raspberry Pi Zero 2 W. See docs/rpi-zero2w-minimal.md for build, export and SD-card testing instructions.
+
+Build the first target: docker compose run --rm builder bash /project/scripts/rpi-zero2w.sh build

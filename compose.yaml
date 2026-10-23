@@ -11,6 +11,7 @@ services:
     tty: true
     volumes:
       - workspace:/work
+      - .:/project:ro
 volumes:
   workspace:
     name: yocto-foundation-workspace
