@@ -1,0 +1,9 @@
+# Local exports: keep guidance, exclude large generated device images.
+/artifacts/*
+!/artifacts/README.md
+
+# Build only on Linux storage; prevent accidental generated trees in this checkout.
+/builds/
+/downloads/
+/sstate-cache/
+/tmp/

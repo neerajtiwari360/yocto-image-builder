@@ -1,0 +1,16 @@
+name: yocto-foundation
+services:
+  builder:
+    build:
+      context: ./docker
+    image: yocto-foundation:ubuntu22.04
+    user: "1000:1000"
+    working_dir: /work
+    init: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - workspace:/work
+volumes:
+  workspace:
+    name: yocto-foundation-workspace
