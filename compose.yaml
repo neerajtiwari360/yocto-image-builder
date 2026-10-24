@@ -12,6 +12,7 @@ services:
     volumes:
       - workspace:/work
       - .:/project:ro
+      - ./artifacts:/artifacts
 volumes:
   workspace:
     name: yocto-foundation-workspace

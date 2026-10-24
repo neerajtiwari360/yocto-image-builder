@@ -3,7 +3,7 @@ set -euo pipefail
 test "$(id -u)" -ne 0
 test -w /work
 test "$(locale charmap)" = UTF-8
-for tool in git gcc g++ make python3 tar gawk diffstat chrpath cpio wget zstd lz4 patch; do
+for tool in git gcc g++ make python3 tar gawk diffstat chrpath cpio wget zstd lz4 patch rsync flock mountpoint bzip2; do
     command -v "$tool" >/dev/null
 done
 python3 -c 'import git, jinja2, pexpect'

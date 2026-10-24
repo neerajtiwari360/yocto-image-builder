@@ -1,7 +1,7 @@
 # Small first image for Raspberry Pi Zero 2 W
 
 Target: rpi-zero2w-minimal. Machine: raspberrypi0-2w (32-bit).
-Image recipe: product-minimal. Yocto 5.0.14 / Scarthgap.
+Image recipe: product-minimal. Yocto 5.0.19 / Scarthgap.
 Exact Poky and Raspberry Pi BSP commits are locked in sources.conf.
 
 This basic console OS contains BusyBox, init, boot components. Standard USB keyboard support is built into the Pi kernel.
@@ -18,7 +18,7 @@ yocto/layers/meta-product/: device software recipe.
 yocto/targets/rpi-zero2w-minimal/: board selection, source lock and build settings.
 scripts/rpi-zero2w.sh: prepare, build and export commands.
 /project: read-only mount of the Windows project.
-/work/project-layers/meta-product: synchronized Linux copy for BitBake; edit the Windows original.
+/work/project-layers/scarthgap/rpi-zero2w-minimal/meta-product: synchronized Linux copy for BitBake; edit the Windows original.
 /work/layers/scarthgap/: pinned upstream sources.
 /work/builds/scarthgap/rpi-zero2w-minimal/: generated Linux build files.
 /work/downloads and /work/sstate-cache: shared caches.
@@ -58,7 +58,7 @@ Expected SD image: product-minimal-raspberrypi0-2w.rootfs.wic.bz2
 Exports include the compressed SD image, bmap, package manifest, source locks,
 target configuration, authored layer snapshot, byte sizes and SHA256 checksums.
 
-The export includes pi-zero2w-minimal.img ready for Raspberry Pi Imager's Use Custom option; the .wic.bz2 is its compressed copy.
+New exports include rpi-zero2w-minimal.img ready for Raspberry Pi Imager's Use Custom option; the .wic.bz2 is its compressed copy. Earlier exports retain their original pi-zero2w-minimal.img filename.
 Flashing erases the selected SD card; verify the destination yourself.
 No SD card is flashed by the scripts.
 

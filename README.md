@@ -1,62 +1,57 @@
-# yocto-image-builder
+# Yocto image builder
 
-Build custom Linux OS images for multiple device models using one shared Docker build environment.
+One reusable Linux Docker environment, with explicit configurations for each device image.
+Docker contains PC build tools; Yocto recipes select the software installed on a device.
+Python and Git in the builder do not automatically go into a device image.
 
-## What belongs where?
+## 1. Prepare the foundation (no device required)
 
-| Location | Purpose | Runs on the device? |
-| --- | --- | --- |
-| docker/ | Ubuntu build tools, non-root build user, foundation checks | No |
-| compose.yaml | Starts the local builder and attaches its persistent Linux workspace | No |
-| yocto/layers/ | Future version-controlled OS recipes, packages, services and configuration | Selected contents become part of the OS |
-| yocto/targets/ | Future named build selections: release + machine + distro + image | Controls what is built |
-| docs/ | Setup, architecture and usage guides | No |
-| artifacts/ | Copies of completed device images and their release records | Images here can be flashed |
-| /work inside builder | Linux sources, caches and separate build directories in a persistent Docker volume | No; contains generated device images |
+From PowerShell at the repository root, with Docker Desktop in Linux container mode:
 
-The Docker image is a development tool. The Yocto image is the operating system you flash onto a device.
-Adding software to docker/Dockerfile only installs it in the builder.
-Adding software to a Yocto image recipe controls installation in the device OS.
+```powershell
+docker compose build
+docker compose run --rm builder bash /project/scripts/setup.sh
+```
 
-## Folder layout
+This validates tools, Linux filesystem behavior and non-root compilation and creates
+workspace directories. It does not fetch a BSP or generate a device image.
+The existing `yocto-foundation-workspace` volume is retained.
 
-    yocto-image-builder/
-      compose.yaml
-      docker/
-        Dockerfile
-        .dockerignore
-        validate-foundation.sh
-      yocto/
-        layers/
-          README.md
-        targets/
-          README.md
-      docs/
-        docker-setup.md
-        project-structure.md
-      artifacts/
-        README.md
+## 2. Define the required image
 
-## Start the local builder
+Fill in [the requirements checklist](templates/target/requirements.md). Choose a
+Yocto release, compatible BSP, MACHINE, software recipe, boot format and acceptance criteria.
+Create a target under `yocto/targets/<name>/` following [the target guide](yocto/targets/README.md).
+The existing `rpi-zero2w-minimal` target is a working example.
 
-From PowerShell in D:\Github\yocto-image-builder:
+## 3. Prepare, build and export a selected target
 
-    docker compose build
-    docker compose run --rm builder validate-foundation
-    docker compose run --rm builder
+```powershell
+docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal prepare
+docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal parse
+docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal build
+docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal export
+```
 
-Inside the container, work in /work. Type exit to leave.
-Your /work files survive disposable container removal.
-Do not remove the Docker volume unless you intend to delete the workspace.
+`prepare` fetches exact locked sources and configures the target; `parse` checks metadata;
+`build` produces the device OS, exports it and saves a checksum-verified copy to your local artifacts folder. `export` repeats export without rebuilding.
+Exports are in `/work/exports/<release>/<target>/<tag>-<UTC timestamp>/`.
+Local files are saved automatically to `artifacts/<release>/<target>/<version>/` in this checkout. No docker cp is needed. The original `scripts/rpi-zero2w.sh` commands still work.
 
-## Scaling to more boards and images
+## Repository layout
 
-Keep hardware support (MACHINE), shared OS policy (DISTRO), and software selection (image recipe) separate.
-One device model can have minimal, gateway and graphical image variants.
-Many physical devices of the same model can use the same image; give each its own identity during provisioning.
-Keep each target's build directory separate. Reuse compatible download and sstate caches.
+| Path | Purpose |
+| --- | --- |
+| `docker/`, `compose.yaml` | Reusable PC build environment and persistent Linux volume |
+| `scripts/setup.sh` | Device-independent initialization and validation |
+| `scripts/image.sh` | Generic target preparation, parsing, building and exporting |
+| `templates/target/` | Requirements checklist before adding hardware |
+| `yocto/config/` | Shared build configuration, without a MACHINE selection |
+| `yocto/targets/<name>/` | Source locks, board settings and output selection |
+| `yocto/layers/` | Authored device software and optional local BSP layers |
+| `artifacts/` | Windows copies of completed exports, excluded from Git |
+| `docs/` | Setup, structure and device instructions |
 
-Read docs/project-structure.md before adding a target.
-The first configured target is rpi-zero2w-minimal: a small 32-bit console OS for Raspberry Pi Zero 2 W. See docs/rpi-zero2w-minimal.md for build, export and SD-card testing instructions.
-
-Build the first target: docker compose run --rm builder bash /project/scripts/rpi-zero2w.sh build
+All compilation occurs under `/work` on Linux storage. `/project` is a read-only source mount.
+Never remove the workspace volume unless you intend to delete builds, caches and exports.
+See [the structure guide](docs/project-structure.md) and [Docker setup](docs/docker-setup.md).
