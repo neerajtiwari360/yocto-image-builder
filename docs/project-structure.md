@@ -24,11 +24,7 @@ Do not edit the generated copies. Local layers are isolated per release and targ
 
 The runner preserves the existing volume, upstream sources, builds and caches. Local layers are synchronized into the isolated path for the selected target.
 
-One target means a board, release, distro and software role. Reuse common recipes and
-package groups in meta-product. Add a local BSP layer only for actual hardware changes.
-Use a separate image recipe for a gateway or graphical role rather than adding those packages
-to every minimal image. Identical physical devices normally share an image and receive unique
-credentials and identities during provisioning.
+The KV260 target uses the meta-kv260 layer for its hardware configuration, sensor software and image recipe.
 
 Do not run manual BitBake commands against a target while the runner is building it.
 The runner locks each target and serializes shared source preparation. Source revisions

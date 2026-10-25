@@ -17,11 +17,8 @@ This validates tools, Linux filesystem behavior and non-root compilation and cre
 workspace directories. It does not fetch a BSP or generate a device image.
 The existing `yocto-foundation-workspace` volume is retained.
 
-## 2. Define the required image
+## 2. Xilinx Kria KV260 image
 
-Fill in [the requirements checklist](templates/target/requirements.md). Choose a
-Yocto release, compatible BSP, MACHINE, software recipe, boot format and acceptance criteria.
-Create a target under `yocto/targets/<name>/` following [the target guide](yocto/targets/README.md).
 The `kv260-hcsr04-minimal` target packages only the HC-SR04 application for the
 Kria KV260; see [its build and first-boot guide](docs/kv260-hcsr04-minimal.md).
 
@@ -46,7 +43,6 @@ Local files are saved automatically to `artifacts/<release>/<target>/<version>/`
 | `docker/`, `compose.yaml` | Reusable PC build environment and persistent Linux volume |
 | `scripts/setup.sh` | Device-independent initialization and validation |
 | `scripts/image.sh` | Generic target preparation, parsing, building and exporting |
-| `templates/target/` | Requirements checklist before adding hardware |
 | `yocto/config/` | Shared build configuration, without a MACHINE selection |
 | `yocto/targets/<name>/` | Source locks, board settings and output selection |
 | `yocto/layers/` | Authored device software and optional local BSP layers |
