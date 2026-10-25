@@ -1,5 +1,10 @@
 # KV260 minimal HC-SR04 image
 
+The user has confirmed physical image/sensor testing on the KV260. See
+[the software separation guide](hcsr04-software.md) for driver/application updates
+without rebuilding the full OS. Automatic boot on the observed legacy QSPI
+firmware still needs the carrier-check issue resolved; manual boot has succeeded.
+
 This target builds a 64-bit Cortex-A53 UART console image for a Kria K26 starter
 SOM on the KV260 Vision AI carrier, revisions A/Z and B/1/2. It includes BusyBox,
 the Linux GPIO/FPGA drivers, the HC-SR04 C reader and a pinned EMIO bitstream.

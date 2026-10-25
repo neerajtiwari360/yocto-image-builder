@@ -1,10 +1,13 @@
 SUMMARY = "HC-SR04 C userspace GPIO reader from kria-project"
 LICENSE = "CLOSED"
-SRC_URI = "file://source"
-S = "${WORKDIR}/source"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files/source:"
+SRC_URI = "file://app"
+S = "${WORKDIR}/app"
+DEPENDS = "hcsr04-driver"
 do_compile() {
-    oe_runmake CC="${CC}" AR="${AR}" CPPFLAGS="${CPPFLAGS} -Iinclude -Iapp" CFLAGS="${CFLAGS} -std=c11 -Wall -Wextra -Wpedantic -Werror" LDFLAGS="${LDFLAGS}"
+    ${CC} ${CPPFLAGS} ${CFLAGS} -std=c11 -Wall -Wextra -Wpedantic -Werror \
+        -I${S} ${S}/main.c ${S}/distance.c ${LDFLAGS} -lhcsr04 -o ${B}/hcsr04-reader
 }
 do_install() {
-    install -Dm0755 ${S}/hcsr04-reader ${D}${bindir}/hcsr04-reader
+    install -Dm0755 ${B}/hcsr04-reader ${D}${bindir}/hcsr04-reader
 }
