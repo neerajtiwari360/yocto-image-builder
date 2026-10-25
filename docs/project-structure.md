@@ -22,10 +22,7 @@ Do not edit the generated copies. Local layers are isolated per release and targ
   exports/<release>/<target>/<version>/
 ```
 
-The runner preserves the existing volume, Pi build directory, upstream sources and caches.
-Its first Pi preparation replaces old runner-added layer entries with the isolated layer path.
-This path change may cause some tasks to rebuild. Old exports are unchanged.
-The previous /work/project-layers/meta-product copy is left in place but is no longer used.
+The runner preserves the existing volume, upstream sources, builds and caches. Local layers are synchronized into the isolated path for the selected target.
 
 One target means a board, release, distro and software role. Reuse common recipes and
 package groups in meta-product. Add a local BSP layer only for actual hardware changes.

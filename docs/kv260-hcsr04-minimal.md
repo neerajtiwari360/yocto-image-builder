@@ -35,7 +35,7 @@ artifacts/scarthgap-kv260/kv260-hcsr04-minimal/<version>/kv260-hcsr04-minimal.im
 
 The release also contains a compressed WIC, bmap, package manifest, source/config
 snapshots, structural validation and SHA256SUMS. Export verifies checksums on the
-Windows copy. The separate source/build namespace preserves the Pi configuration.
+Windows copy. The target uses its own source/build namespace.
 
 The SD layout uses 64 MiB FAT boot plus ext4 root. Actual sizes are reported by
 validation after building; they are not predetermined. Structural validation

@@ -66,7 +66,7 @@ done
 source "$poky/oe-init-build-env" "$build" >/dev/null
 include="require $config/local.conf"
 grep -Fxq "$include" conf/local.conf || printf '\n%s\n' "$include" >> conf/local.conf
-# Replace runner-owned layer entries, including the previous Pi runner's entries.
+# Replace runner-owned layer entries.
 sed -i '/^# image-builder managed layers$/d; /^BBLAYERS += "\/work\/\(layers\|project-layers\)\//d' conf/bblayers.conf
 printf '\n# image-builder managed layers\n' >> conf/bblayers.conf
 for layer in "${layers[@]}"; do

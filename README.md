@@ -22,23 +22,22 @@ The existing `yocto-foundation-workspace` volume is retained.
 Fill in [the requirements checklist](templates/target/requirements.md). Choose a
 Yocto release, compatible BSP, MACHINE, software recipe, boot format and acceptance criteria.
 Create a target under `yocto/targets/<name>/` following [the target guide](yocto/targets/README.md).
-The existing `rpi-zero2w-minimal` target is a working example.
 The `kv260-hcsr04-minimal` target packages only the HC-SR04 application for the
 Kria KV260; see [its build and first-boot guide](docs/kv260-hcsr04-minimal.md).
 
 ## 3. Prepare, build and export a selected target
 
 ```powershell
-docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal prepare
-docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal parse
-docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal build
-docker compose run --rm builder bash /project/scripts/image.sh rpi-zero2w-minimal export
+docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal prepare
+docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal parse
+docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal build
+docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal export
 ```
 
 `prepare` fetches exact locked sources and configures the target; `parse` checks metadata;
 `build` produces the device OS, exports it and saves a checksum-verified copy to your local artifacts folder. `export` repeats export without rebuilding.
 Exports are in `/work/exports/<release>/<target>/<tag>-<UTC timestamp>/`.
-Local files are saved automatically to `artifacts/<release>/<target>/<version>/` in this checkout. No docker cp is needed. The original `scripts/rpi-zero2w.sh` commands still work.
+Local files are saved automatically to `artifacts/<release>/<target>/<version>/` in this checkout. No docker cp is needed.
 
 ## Repository layout
 

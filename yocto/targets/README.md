@@ -15,12 +15,12 @@ Example runner settings (replace placeholders; this is not a configured target):
 
 ```bash
 RELEASE=scarthgap
-IMAGE_RECIPE=product-minimal
+IMAGE_RECIPE=product-example
 TARGET_MACHINE=vendor-machine
 EXTERNAL_LAYERS=("meta-vendor|https://example.com/vendor.git|EXACT_COMMIT")
 LOCAL_LAYERS=(meta-product)
-EXPORT_FILES=(product-minimal-vendor-machine.rootfs.wic.bz2 product-minimal-vendor-machine.rootfs.manifest)
-SD_IMAGE_BZ2=product-minimal-vendor-machine.rootfs.wic.bz2
+EXPORT_FILES=(product-example-vendor-machine.rootfs.wic.bz2 product-example-vendor-machine.rootfs.manifest)
+SD_IMAGE_BZ2=product-example-vendor-machine.rootfs.wic.bz2
 ```
 
 An external-layer entry is `repository-name|URL|commit|optional-layer-subdirectory`.
@@ -30,7 +30,7 @@ Use `LOCAL_LAYERS=()` when no local layer is required.
 EXPORT_FILES lists exact deploy filenames; include manifests, maps and licenses as required.
 SD_IMAGE_BZ2 is optional: it expands a bzipped SD image to `<target>.img`.
 IMAGE_VERIFIER is optional: a Python script relative to scripts/ receiving the expanded image.
-The existing verify-sd-image.py is Pi-specific; do not apply it to other boards.
+The supplied verify-kv260-image.py checks the KV260 boot files and SD layout.
 Without a verifier, export copies and hashes files but does not validate boot structure.
 
 Keep TARGET_MACHINE consistent with MACHINE in local.conf. Set IMAGE_FSTYPES there;
