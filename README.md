@@ -23,6 +23,8 @@ Fill in [the requirements checklist](templates/target/requirements.md). Choose a
 Yocto release, compatible BSP, MACHINE, software recipe, boot format and acceptance criteria.
 Create a target under `yocto/targets/<name>/` following [the target guide](yocto/targets/README.md).
 The existing `rpi-zero2w-minimal` target is a working example.
+The `kv260-hcsr04-minimal` target packages only the HC-SR04 application for the
+Kria KV260; see [its build and first-boot guide](docs/kv260-hcsr04-minimal.md).
 
 ## 3. Prepare, build and export a selected target
 

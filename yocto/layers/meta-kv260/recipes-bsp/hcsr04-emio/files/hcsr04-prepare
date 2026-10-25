@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+if [ "${1:-}" != --confirm-sensor-power-off ] || [ "$#" -ne 1 ]; then
+    echo 'Usage: hcsr04-prepare --confirm-sensor-power-off' >&2
+    echo 'Keep HC-SR04 power off; disconnect GY-521 before preparing FPGA/GPIO.' >&2
+    exit 2
+fi
+test "$(id -u)" = 0 || { echo 'Run as root' >&2; exit 1; }
+tr '\000' '\n' < /proc/device-tree/compatible | grep -q 'xlnx,zynqmp-sk-kv260' || {
+    echo 'Expected KV260 carrier device tree' >&2; exit 1;
+}
+mkdir -p /sys/kernel/config
+grep -qs ' /sys/kernel/config configfs ' /proc/mounts || mount -t configfs configfs /sys/kernel/config
+for name in ubiety-gy521-i2c gy521-i2c dht11-j2-pin1; do
+    test ! -d "/sys/kernel/config/device-tree/overlays/$name" || {
+        echo "Conflicting overlay: $name" >&2; exit 1;
+    }
+done
+firmware=/proc/device-tree/fpga-region/firmware-name
+if [ -f "$firmware" ]; then
+    current=$(tr -d '\000' < "$firmware")
+    test "$current" = ubiety-gy521-emio.bit.bin || {
+        echo "Another FPGA design is active: $current; inspect before changing it" >&2; exit 1;
+    }
+else
+    overlay=/sys/kernel/config/device-tree/overlays/hcsr04-emio
+    test ! -e "$overlay" || { echo 'Existing overlay needs inspection' >&2; exit 1; }
+    mkdir "$overlay"
+    cat /usr/share/hcsr04/hcsr04-emio.dtbo > "$overlay/dtbo"
+    test "$(cat "$overlay/status")" = applied
+fi
+test "$(tr -d '\000' < "$firmware")" = ubiety-gy521-emio.bit.bin
+test "$(cat /sys/class/fpga_manager/fpga0/state)" = operating
+echo 'FPGA prepared. Check physical fan operation. Keep sensor power off until the reader reports READY.'
+echo 'Next: hcsr04-reader --confirm-protected-wiring --wait'

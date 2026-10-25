@@ -4,6 +4,9 @@ import struct
 import sys
 
 path = pathlib.Path(sys.argv[1])
+profile = sys.argv[2] if len(sys.argv) > 2 else "rpi-zero2w"
+if profile not in ("rpi-zero2w", "kv260"):
+    raise ValueError(f"Unknown board profile: {profile}")
 size = path.stat().st_size
 with path.open("rb") as disk:
     def read_at(offset, length):
@@ -74,9 +77,12 @@ with path.open("rb") as disk:
             name = base + ("." + extension if extension else "")
         names.add(name.lower())
         long_parts = []
-    expected = {"kernel7.img", "config.txt", "cmdline.txt", "start.elf",
-                "bcm2710-rpi-zero-2.dtb"}
-    assert expected <= names, f"Missing boot files: {expected - names}"
+    if profile == "kv260":
+        expected = {"image", "boot.scr", "kv260-reva.dtb", "kv260-revb.dtb"}
+    else:
+        expected = {"kernel7.img", "config.txt", "cmdline.txt", "start.elf",
+                    "bcm2710-rpi-zero-2.dtb"}
+    assert expected <= names, f"Missing boot files: {expected - names}; found: {sorted(names)}"
     superblock = read_at(partitions[1][1] * 512 + 1024, 1024)
     assert superblock[56:58] == b"\x53\xef", "Invalid ext4 root filesystem"
     blocks = struct.unpack_from("<I", superblock, 4)[0]
@@ -86,5 +92,6 @@ with path.open("rb") as disk:
     print(f"Uncompressed SD image: {size:,} bytes")
     print(f"Root filesystem capacity: {blocks * block_size:,} bytes")
     print(f"Root filesystem allocated blocks: {(blocks - free_blocks) * block_size:,} bytes (includes filesystem metadata)")
-    print("Board-specific kernel, config, command line and Pi Zero 2 DTB present.")
+    print("KV260 kernel, boot script and carrier DTBs present." if profile == "kv260"
+          else "Board-specific kernel, config, command line and Pi Zero 2 DTB present.")
     print("Physical hardware boot has not been tested.")

@@ -1,0 +1,13 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    fragment@0 {
+        target-path = "/fpga-region";
+        __overlay__ {
+            firmware-name = "ubiety-gy521-emio.bit.bin";
+            resets = <&zynqmp_reset 116>, <&zynqmp_reset 117>,
+                     <&zynqmp_reset 118>, <&zynqmp_reset 119>;
+        };
+    };
+};
