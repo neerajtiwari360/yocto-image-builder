@@ -39,7 +39,7 @@ card. Wi-Fi, user and SSH customisation through Imager are not supported by this
 image. The optional `c-toolchain.tar.gz` bundle is not an SD image and must not
 be selected in Imager.
 
-The layout has a 32 MiB FAT boot partition and a writable ext4 root partition.
+The layout has a 64 MiB FAT boot partition and a writable ext4 root partition.
 The current kernel and boot assets occupy about 24 MB. If future boot assets
 outgrow this partition, increase its size in `kv260-hcsr04.wks` before rebuilding.
 Rootfs size follows installed contents, with no fixed minimum or extra development
