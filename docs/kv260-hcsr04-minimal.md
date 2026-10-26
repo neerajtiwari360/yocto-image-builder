@@ -1,10 +1,12 @@
-# KV260 C development image
+# KV260 offline console image
 
 The historical `kv260-hcsr04-minimal` target and image recipe names are retained
 so existing build commands and export paths continue to work. This target now
-includes the lightweight `opkg` package manager and a persistent project workspace.
+uses loopback-only networking and a persistent project workspace. No Ethernet
+or Wi-Fi interface is configured to come up automatically; no DHCP is requested.
+No package manager is installed, and no network download is needed on the board.
 GCC, Make, development headers and the C++ toolchain are not preinstalled.
-The broad `tools-sdk` and `dev-pkgs` features are disabled. HC-SR04 application, userspace driver,
+The `tools-sdk`, `dev-pkgs` and `package-management` features are disabled. HC-SR04 application, userspace driver,
 sensor test code, FPGA preparation helper and sensor bitstream are removed.
 Standard Linux board, GPIO and FPGA drivers remain available.
 
@@ -36,8 +38,7 @@ Imager's **Use custom** option. No conversion or additional build is needed:
 
 The image boots a KV260, not a Raspberry Pi. Imager is used only to write the SD
 card. Wi-Fi, user and SSH customisation through Imager are not supported by this
-image. The optional `c-toolchain.tar.gz` bundle is not an SD image and must not
-be selected in Imager.
+image. Keep Ethernet unplugged for physical network isolation.
 
 The layout has a 64 MiB FAT boot partition and a writable ext4 root partition.
 The current kernel and boot assets occupy about 24 MB. If future boot assets
@@ -76,70 +77,49 @@ succeeded; automatic boot on observed legacy QSPI firmware had a carrier-check
 issue. This development image still requires hardware boot verification.
 
 Use UART at 115200 8N1. Log in as `root` with no password for local bench use.
-No SSH service or configured public online package feed is provided. Optional
-C build tools can be installed from matching packages built on your PC, as below.
+There is no SSH service, package manager or automatic Ethernet/Wi-Fi setup.
+USB host support, UART, SD boot, GPIO and FPGA kernel support remain available.
+The Linux network stack and administration commands remain, so root can explicitly
+configure networking; this is an offline boot policy, not removal of kernel networking.
 The boot script selects the matching carrier DTB and boots using the ext4
 partition PARTUUID. Keep the working SD card and capture UART output on failure.
 
-## Install the C compiler later
+## Build applications on the laptop and transfer offline
 
-The base image contains `opkg`, not a compiler. Build and flash the new image
-first; older images without `opkg` do not support these instructions. Expand the
-root filesystem as described above before installing tools or compiling projects.
+Cross-compile applications inside the laptop's Docker/Yocto environment against
+this image's ARM64 configuration and libraries. Do not copy Windows executables.
+The board does not need GCC, package installation or a network connection to run
+an already compiled application. The laptop build may fetch upstream sources;
+that is independent of networking on the board.
 
-When you need C compilation, build an optional offline package bundle on the PC:
+For HC-SR04, the source and Docker cross-build helper are maintained separately
+in `D:/Github/kria-project/software/hcsr04`; see that folder's README. This base
+image does not preinstall the sensor executable or its FPGA firmware.
 
-```powershell
-docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal c-packages
-```
-
-This exports `c-toolchain.tar.gz`, source locks and checksums under:
-
-```text
-artifacts/scarthgap-kv260/kv260-hcsr04-minimal/c-packages/<version>/
-```
-
-The archive contains the full indexed IPK feed from this target build so that
-package dependencies are available. It may be large; it is separate from the SD
-image. Only the requested C tools and their dependencies are installed, not every
-package in the archive. Generate it using the same source locks and configuration
-as the flashed image; regenerate the bundle when those change. Do not use Ubuntu,
-Debian or arbitrary third-party packages on this Yocto image.
-
-Copy the archive and SHA256SUMS plus sources.conf to a USB drive. On the board,
-with the drive mounted at `/mnt/usb` and files at its root:
+The preferred deployment connection is the existing COM-port UART link, with no
+Ethernet or USB flash drive. A laptop sender can encode binary files as octal
+escapes and send paced shell `printf` commands. The board shell reconstructs the
+bytes into a file. For example, this demonstrates the mechanism with a text file:
 
 ```sh
-cd /mnt/usb
-sha256sum -c SHA256SUMS
-mkdir -p /mnt/usb/c-toolchain
-tar -xzf c-toolchain.tar.gz -C /mnt/usb/c-toolchain
-sh /mnt/usb/c-toolchain/install-c-toolchain.sh
+mkdir -p /opt/projects
+printf '\110\145\154\154\157\012' > /opt/projects/serial-check.txt
+cat /opt/projects/serial-check.txt
+sha256sum /opt/projects/serial-check.txt
 ```
 
-Stop if checksums fail. The helper uses a temporary local `file://` feed and
-installs GCC, the C preprocessor, binutils, Make, glibc development headers and
-pkg-config. No network connection is required on the board. G++ and C++
-development libraries are not requested. Installed packages survive reboot, but
-reflashing replaces them. The helper removes its feed configuration afterward,
-so the USB drive can be unmounted. Verify `gcc --version` and `make --version`.
+For an executable, transfer to a temporary file, compare its SHA256 with the
+laptop original, then rename it and make it executable. A sender must pace chunks
+and check acknowledgements to avoid overrunning the UART shell. A complete binary
+serial-transfer helper is not included yet; this method has not yet been validated
+end-to-end for an executable. Previous live deployment used Ethernet, not serial.
 
-## Compile and keep code on the board
-
-After installing the optional C tools, transfer your source using a mounted USB drive, or create it through the UART
-shell. For example, on the board:
-
-```sh
-mkdir -p /opt/projects/hello
-cd /opt/projects/hello
-cat > hello.c <<'EOF'
-#include <stdio.h>
-int main(void) { puts("Hello from KV260 C"); return 0; }
-EOF
-gcc -Wall -Wextra hello.c -o hello-c
-./hello-c
-sync
-```
+The roughly 104 KB HC-SR04 executable is practical to transfer over UART. Its
+roughly 7.8 MB FPGA bitstream is much slower; it can instead be included at image
+build time. This base image does not include either artifact automatically.
+Keep the HC-SR04 sensor powered off while preparing FPGA/GPIO, and follow the
+separate sensor project's safe-start instructions. No package installation is
+required. USB host support remains available, but a USB drive is not required.
 
 Sources and executables in `/opt/projects` are saved on the SD card and survive
 normal reboots. Check with `df -h /opt/projects`. Shut down cleanly with `poweroff`.
@@ -172,7 +152,7 @@ Programs do not automatically start at boot.
 
 3. Run the image build command above. The `board-projects` recipe packages those
    files into `/opt/projects` in the new image. It does not compile them during
-   the Yocto build. After flashing, install the optional C tools before compiling on the board.
+   the Yocto build. Compile on the laptop; copied source is not compiled on the board.
    For automated compilation during every image build, create an application
    recipe that uses `${CC}`, declares library dependencies, and installs
    its executable, then add that package to `IMAGE_INSTALL` in the image recipe.
@@ -182,7 +162,7 @@ including local changes. This is separate from a reproducible Yocto rebuild.
 
 ## Driver development
 
-Userspace C drivers can be built with the same tools. Linux kernel modules
+Userspace C drivers can be cross-compiled on the laptop with the same tools. Linux kernel modules
 need a matching configured kernel build tree, generated headers and symbol
 information; the C toolchain alone does not provide that environment. Build kernel
 modules through Yocto against this image's kernel. Hardware-specific drivers may
@@ -191,10 +171,11 @@ is included in this image.
 
 ## Validation
 
-After building, inspect the exported `.manifest` for `opkg` and `board-projects`.
-Verify GCC, G++, Make, glibc development headers and the old sensor packages are
-not installed in the base image. After installing the optional package bundle,
-run the C example above, reboot, and confirm the tools and projects persist.
+The build verifies that `/etc/network/interfaces` enables only loopback and
+that no compiler or package-manager executables are present. After flashing,
+check `ip link` and `ip addr`: Ethernet should be DOWN without an IP address.
+Verify `command -v opkg` and `command -v gcc` find nothing. Test serial transfer and
+application execution, then confirm project files persist after reboot.
 Structural image validation checks boot files and partition layout, not compiler
 operation or physical hardware boot.
 

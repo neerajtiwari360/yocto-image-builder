@@ -1,0 +1,3 @@
+# Offline board: only local loopback is brought up. No Ethernet, Wi-Fi or DHCP.
+auto lo
+iface lo inet loopback

@@ -25,7 +25,7 @@ Do not edit the generated copies. Local layers are isolated per release and targ
 The runner preserves the existing volume, upstream sources, builds and caches. Local layers are synchronized into the isolated path for the selected target.
 
 The KV260 target uses the meta-kv260 layer for its hardware configuration,
-minimal console image, package management and optional project workspace.
+offline console image and optional project workspace.
 The historical `hcsr04` target/machine/recipe names are retained for compatibility;
 they do not mean the image still contains sensor software.
 
@@ -54,8 +54,8 @@ adding a target is necessary before other boards can be built.
 Targets sharing a `RELEASE` also share upstream checkouts. If they need different
 source revisions, use distinct release namespaces; the runner deliberately refuses
 to silently replace a locked checkout. A different Yocto release may also need an
-updated host container. The optional `c-packages` workflow currently assumes IPK
-packaging and glibc; adapt it before using a different package format or C library.
+updated host container. Package formats are selected at build time; the current
+offline KV260 image does not include a runtime package manager.
 
 Do not run manual BitBake commands against a target while the runner is building it.
 The runner locks each target and serializes shared source preparation. Source revisions

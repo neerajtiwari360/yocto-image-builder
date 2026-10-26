@@ -5,10 +5,10 @@ project=${PROJECT_DIR:-/project}
 target=${1:-}
 mode=${2:-build}
 if [[ ! "$target" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
-    echo "Usage: bash /project/scripts/image.sh <target> [prepare|parse|build|export|c-packages]"
+    echo "Usage: bash /project/scripts/image.sh <target> [prepare|parse|build|export]"
     exit 2
 fi
-case "$mode" in prepare|parse|build|export|c-packages) ;; *) echo "Unknown mode: $mode"; exit 2 ;; esac
+case "$mode" in prepare|parse|build|export) ;; *) echo "Unknown mode: $mode"; exit 2 ;; esac
 config="$project/yocto/targets/$target"
 test -f "$config/target.conf" || { echo "No configured target: $target"; exit 2; }
 source "$config/sources.conf"
@@ -17,7 +17,7 @@ source "$config/target.conf"
 [[ "$RELEASE" =~ ^[a-z0-9][a-z0-9-]*$ ]] || exit 2
 [[ "$POKY_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { echo "Poky requires an exact commit"; exit 2; }
 test "${#EXPORT_FILES[@]}" -gt 0 || { echo "Configure EXPORT_FILES"; exit 2; }
-if [[ "$mode" = build || "$mode" = export || "$mode" = c-packages ]]; then
+if [[ "$mode" = build || "$mode" = export ]]; then
     mountpoint -q /artifacts && test -w /artifacts || {
         echo "Mount the writable local artifacts folder at /artifacts (use docker compose)."
         exit 1
@@ -76,24 +76,6 @@ done
 case "$mode" in
     prepare) echo "Prepared $target: $build" ;;
     parse) bitbake -p ;;
-    c-packages)
-        # This target's package_ipk configuration must also be used for the image.
-        grep -qx 'PACKAGE_CLASSES = "package_ipk"' "$config/local.conf" || {
-            echo "c-packages requires a package_ipk target"; exit 1;
-        }
-        bitbake gcc binutils make glibc pkgconfig
-        bitbake package-index
-        version="$POKY_TAG-$(date -u +%Y%m%dT%H%M%S%NZ)"
-        output="/artifacts/$RELEASE/$target/c-packages/$version"
-        mkdir -p "$output"
-        # Export the full indexed target feed so runtime dependencies are available.
-        # This archive is optional and does not add anything to the base SD image.
-        tar -czf "$output/c-toolchain.tar.gz" -C "$build/tmp/deploy" ipk \
-            -C "$project/scripts" install-c-toolchain.sh
-        cp "$config/sources.conf" "$output/"
-        (cd "$output"; sha256sum c-toolchain.tar.gz sources.conf > SHA256SUMS; sha256sum -c SHA256SUMS)
-        printf 'Saved optional C packages: artifacts/%s/%s/c-packages/%s/\n' "$RELEASE" "$target" "$version"
-        ;;
     build|export)
         if [ "$mode" = build ]; then bitbake "$IMAGE_RECIPE"; fi
         deploy="$build/tmp/deploy/images/$TARGET_MACHINE"

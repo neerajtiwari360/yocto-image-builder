@@ -20,10 +20,10 @@ The existing `yocto-foundation-workspace` volume is retained.
 ## 2. Xilinx Kria KV260 image
 
 The `kv260-hcsr04-minimal` target builds a minimal console image
-for the Kria KV260, with lightweight `opkg` package management and a persistent
-`/opt/projects` workspace. C build tools are optional: the `c-packages` command
-exports an offline bundle for installation after boot. HC-SR04 software and
-firmware have been removed.
+for the Kria KV260, with loopback-only networking and a persistent `/opt/projects`
+workspace. No package manager or compiler is installed. Cross-compile applications
+on the PC and transfer over UART serial, or include them in the image at build time.
+HC-SR04 software and firmware are not preinstalled.
 The historical target name is retained for existing build commands; see
 [the build, first-boot and project-saving guide](docs/kv260-hcsr04-minimal.md).
 
