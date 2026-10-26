@@ -1,6 +1,7 @@
 # Custom Yocto layers
 
-meta-kv260/ contains the Xilinx Kria KV260 BSP additions and HC-SR04 image.
+meta-kv260/ contains the Xilinx Kria KV260 BSP additions, minimal console image
+and project workspace. Historical hcsr04 names remain, but sensor code is removed.
 This parent directory is not itself a layer and must not be added to BBLAYERS.
 Third-party BSP repositories live under /work/layers/<release>/.
 The build helper copies authored metadata to /work/project-layers/<release>/<target>/<layer> on Linux storage.
