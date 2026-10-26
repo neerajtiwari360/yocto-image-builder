@@ -72,9 +72,23 @@ This is a 64-bit Cortex-A53 Linux image for the Kria K26 starter SOM on the KV26
 carrier, revisions A/Z and B/1/2. It relies on existing QSPI firmware to initialize
 the SOM and launch SD `boot.scr`; it does not build or flash BOOT.BIN or QSPI.
 The existing firmware must expose `card1_name=SCK-KV-G`, carrier revision, and
-support `part uuid` and `booti`. Manual boot of the previous sensor image has
-succeeded; automatic boot on observed legacy QSPI firmware had a carrier-check
-issue. This development image still requires hardware boot verification.
+support `part uuid` and `booti`. The boot script accepts whitespace padding around
+the exact `SCK-KV-G` carrier name reported by legacy QSPI firmware, while rejecting
+other carriers and extra name tokens. This boot-script fix still needs an automatic
+boot test on the board; no QSPI firmware update is needed for the name check.
+
+Older flashed images may stop at `ZynqMP>` with a carrier-check failure. Keep
+sensor power off and boot those images temporarily with:
+
+```text
+setenv card1_name SCK-KV-G
+fatload mmc 1:1 0x10000000 boot.scr
+source 0x10000000
+```
+
+After Linux starts, enter `root` at `login:`. These U-Boot commands do not save
+firmware settings and must be repeated after reset until the SD boot script is
+updated. Reflashing replaces project files, so back them up first.
 
 Use UART at 115200 8N1. Log in as `root` with no password for local bench use.
 There is no SSH service, package manager or automatic Ethernet/Wi-Fi setup.

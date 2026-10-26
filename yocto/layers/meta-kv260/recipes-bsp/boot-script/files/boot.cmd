@@ -1,5 +1,17 @@
 # No QSPI writes and no FPGA programming in this script.
-if test "${card1_name}" != "SCK-KV-G"; then
+# Legacy FRU firmware pads card1_name with spaces. Accept one exact token,
+# rejecting missing names, other carriers and names with extra non-space text.
+setenv kvcarrier invalid
+setenv kvcarrier_seen
+for kvword in ${card1_name}; do
+    if test -n "${kvcarrier_seen}"; then
+        setenv kvcarrier invalid
+    else
+        setenv kvcarrier "${kvword}"
+        setenv kvcarrier_seen 1
+    fi
+done
+if test "${kvcarrier}" != "SCK-KV-G"; then
     echo "This image requires a KV260 carrier (SCK-KV-G)."
     exit
 fi
