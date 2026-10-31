@@ -19,6 +19,7 @@ done
 [ "$width" -ge 320 ] && [ "$height" -ge 240 ] && [ $((width % 2)) -eq 0 ] && [ $((height % 2)) -eq 0 ]
 topology=$(mktemp /run/kv260-media.XXXXXX)
 trap 'rm -f "$topology"' EXIT HUP INT TERM
+rm -f /run/kv260-camera.conf
 media=
 attempt=0
 while [ "$attempt" -lt 20 ]; do
@@ -34,9 +35,20 @@ while [ "$attempt" -lt 20 ]; do
     sleep 0.5
 done
 [ -n "$media" ] || { echo 'J7 AP1302/CSI media graph missing; inspect dmesg and firmware' >&2; exit 1; }
-media-ctl -d "$media" -V "\"$ap\":2 [fmt:UYVY8_1X16/${width}x${height} field:none]"
-media-ctl -d "$media" -V "\"$csi\":0 [fmt:UYVY8_1X16/${width}x${height} field:none]"
-media-ctl -d "$media" -V "\"$csi\":1 [fmt:UYVY8_1X16/${width}x${height} field:none]"
+# SmartCam fixes CSI to YUV420 (DT data type 0x18), exposed by this Xilinx
+# kernel as VYYUYY8_1X24 (0x2100). UYVY is YUV422 and fails link validation.
+# Upstream media-ctl lacks this vendor format name, so use the numeric ioctl.
+ap_node=$(media-ctl -d "$media" -e "$ap")
+csi_node=$(media-ctl -d "$media" -e "$csi")
+for node_pad in "$ap_node:2" "$csi_node:0" "$csi_node:1"; do
+    node=${node_pad%:*}
+    pad=${node_pad##*:}
+    v4l2-ctl -d "$node" --set-subdev-fmt="pad=$pad,width=$width,height=$height,code=0x2100,field=none"
+    actual=$(v4l2-ctl -d "$node" --get-subdev-fmt="pad=$pad")
+    printf '%s\n' "$actual"
+    printf '%s\n' "$actual" | grep -q 'Mediabus Code *: 0x2100' || { echo "Unexpected camera bus format on $node pad $pad" >&2; exit 1; }
+    printf '%s\n' "$actual" | grep -q "Width/Height *: $width/$height" || { echo "Unexpected camera dimensions on $node pad $pad" >&2; exit 1; }
+done
 video=
 for name in /sys/class/video4linux/video*/name; do
     [ -f "$name" ] || continue
@@ -50,8 +62,11 @@ for name in /sys/class/video4linux/video*/name; do
 done
 [ -n "$video" ] || { echo 'IAS capture node missing' >&2; exit 1; }
 v4l2-ctl -d "$video" --set-fmt-video="width=$width,height=$height,pixelformat=NV12"
+actual=$(v4l2-ctl -d "$video" --get-fmt-video)
+printf '%s\n' "$actual"
+printf '%s\n' "$actual" | grep -q 'Number of planes *: 1' || { echo 'NV12 capture must expose one contiguous memory plane' >&2; exit 1; }
 if [ "$frames" -gt 0 ]; then
-    timeout 20 v4l2-ctl -d "$video" --stream-mmap=3 --stream-count="$frames" --stream-to=/dev/null
+    timeout -s KILL 20 v4l2-ctl -d "$video" --stream-mmap=3 --stream-count="$frames" --stream-to=/dev/null
 fi
 printf 'media=%s\nvideo=%s\nwidth=%s\nheight=%s\npixel_format=NV12\n' "$media" "$video" "$width" "$height" > /run/kv260-camera.conf
 cat /run/kv260-camera.conf

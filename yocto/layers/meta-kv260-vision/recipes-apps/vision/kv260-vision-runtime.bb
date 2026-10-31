@@ -5,7 +5,7 @@ S = "${WORKDIR}"
 inherit update-rc.d
 INITSCRIPT_NAME = "kv260-vision"
 INITSCRIPT_PARAMS = "defaults 95 05"
-RDEPENDS:${PN} = "vart xir media-ctl v4l-utils kmod"
+RDEPENDS:${PN} = "vart xir media-ctl v4l-utils kmod busybox"
 do_install() {
     install -d ${D}${libexecdir}/kv260-vision ${D}${bindir} ${D}${sysconfdir}/init.d ${D}${sysconfdir}/default ${D}/opt/models ${D}${docdir}/${PN}
     install -m0755 ${WORKDIR}/kv260-vision ${D}${sysconfdir}/init.d/kv260-vision

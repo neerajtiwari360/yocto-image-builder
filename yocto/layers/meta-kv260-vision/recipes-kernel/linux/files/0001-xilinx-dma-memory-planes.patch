@@ -1,0 +1,20 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] media: xilinx: report the negotiated number of memory planes
+
+S_FMT receives a zero-initialized num_planes from userspace. Return the
+format table's buffer count, otherwise G_FMT advertises zero planes and
+native NV12 consumers cannot validate the capture layout.
+
+Upstream-Status: Pending
+
+--- a/drivers/media/platform/xilinx/xilinx-dma.c
++++ b/drivers/media/platform/xilinx/xilinx-dma.c
+@@ -865,6 +865,8 @@
+ 		struct v4l2_plane_pix_format *plane_fmt;
+ 
+ 		pix_mp = &format->fmt.pix_mp;
++		/* V4L2 memory planes, not the number of Y/UV components. */
++		pix_mp->num_planes = info->buffers;
+ 		plane_fmt = pix_mp->plane_fmt;
+ 		pix_mp->field = dma->format.fmt.pix_mp.field;
+ 		width = rounddown(pix_mp->width * info->bpl_factor,
