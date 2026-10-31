@@ -1,0 +1,169 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] edge: explicitly export VART legacy shim entry points
+
+Keep C linkage and public visibility explicit on legacy shim definitions.
+
+Upstream-Status: Inappropriate [VART 3.5 compatibility]
+---
+--- a/runtime_src/core/edge/user/shim.cpp
++++ b/runtime_src/core/edge/user/shim.cpp
+@@ -2212,6 +2212,7 @@
+ // Implementation of user exposed SHIM APIs
+ // This are C level functions
+ ////////////////////////////////////////////////////////////////
++extern "C" XCL_DRIVER_DLLESPEC
+ unsigned
+ xclProbe()
+ {
+@@ -2256,6 +2257,7 @@
+   });
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ xclDeviceHandle
+ xclOpen(unsigned deviceIndex, const char*, xclVerbosityLevel)
+ {
+@@ -2290,6 +2292,7 @@
+   }) ;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ void
+ xclClose(xclDeviceHandle handle)
+ {
+@@ -2301,6 +2304,7 @@
+   }) ;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ unsigned int
+ xclAllocBO(xclDeviceHandle handle, size_t size, int, unsigned flags)
+ {
+@@ -2352,6 +2356,7 @@
+   return drv->xclGetHostBO(paddr, size);
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ void
+ xclFreeBO(xclDeviceHandle handle, unsigned int boHandle)
+ {
+@@ -2394,6 +2399,7 @@
+   }) ;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ void *
+ xclMapBO(xclDeviceHandle handle, unsigned int boHandle, bool write)
+ {
+@@ -2406,6 +2412,7 @@
+   } );
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclUnmapBO(xclDeviceHandle handle, unsigned int boHandle, void* addr)
+ {
+@@ -2416,6 +2423,7 @@
+   return drv->xclUnmapBO(boHandle, addr);
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclSyncBO(xclDeviceHandle handle, unsigned int boHandle, xclBOSyncDirection dir,
+           size_t size, size_t offset)
+@@ -2579,6 +2587,7 @@
+   return xclLoadXclBinImpl(handle, buffer, true);
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclLoadXclBin(xclDeviceHandle handle, const xclBin *buffer)
+ {
+@@ -2609,6 +2618,7 @@
+   }) ;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclGetDeviceInfo2(xclDeviceHandle handle, xclDeviceInfo2 *info)
+ {
+@@ -2618,6 +2628,7 @@
+   return drv->xclGetDeviceInfo2(info);
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclGetBOProperties(xclDeviceHandle handle, unsigned int boHandle, xclBOProperties *properties)
+ {
+@@ -2636,6 +2647,7 @@
+   return 2;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclExecBuf(xclDeviceHandle handle, unsigned int cmdBO)
+ {
+@@ -2647,6 +2659,7 @@
+   }) ;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclExecWait(xclDeviceHandle handle, int timeoutMilliSec)
+ {
+@@ -2797,6 +2810,7 @@
+ /*
+  * Context switch phase 1: support xclbin swap, no cu and shared checking
+  */
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclOpenContext(xclDeviceHandle handle, const uuid_t xclbinId, unsigned int ipIndex, bool shared)
+ {
+@@ -2813,6 +2827,7 @@
+   }) ;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclCloseContext(xclDeviceHandle handle, const uuid_t xclbinId, unsigned ipIndex)
+ {
+@@ -2877,6 +2892,7 @@
+   return 0;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclLockDevice(xclDeviceHandle handle)
+ {
+@@ -2923,6 +2939,7 @@
+   return 0;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ ssize_t
+ xclUnmgdPread(xclDeviceHandle handle, unsigned flags, void *buf,
+               size_t count, uint64_t offset)
+@@ -2932,6 +2949,7 @@
+   }) ;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ ssize_t
+ xclUnmgdPwrite(xclDeviceHandle handle, unsigned flags, const void *buf,
+                size_t count, uint64_t offset)
+@@ -3006,6 +3024,7 @@
+   return drv ? drv->xclRegRead(ipIndex, offset, datap) : -ENODEV;
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclIPName2Index(xclDeviceHandle handle, const char *name)
+ {
+@@ -3023,6 +3042,7 @@
+   }
+ }
+ 
++extern "C" XCL_DRIVER_DLLESPEC
+ int
+ xclIPSetReadRange(xclDeviceHandle handle, uint32_t ipIndex, uint32_t start, uint32_t size)
+ {

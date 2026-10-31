@@ -1,0 +1,181 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] xrt: export legacy C APIs consumed by VART 3.5
+
+Restore compatibility exports for APIs implemented by XRT but hidden in 2.18.
+Only declarations referenced by the pinned VART sources are affected.
+
+Upstream-Status: Inappropriate [VART 3.5 compatibility]
+---
+--- a/runtime_src/core/include/deprecated/xrt.h
++++ b/runtime_src/core/include/deprecated/xrt.h
+@@ -254,7 +254,7 @@
+  *
+  * Return: count of devices found
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ unsigned int
+ xclProbe();
+ 
+@@ -267,7 +267,7 @@
+  *
+  * Return:         Device handle
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ xclDeviceHandle
+ xclOpen(unsigned int deviceIndex, const char* unused1, enum xclVerbosityLevel unused2);
+ 
+@@ -276,7 +276,7 @@
+  *
+  * @handle:        Device handle
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ void
+ xclClose(xclDeviceHandle handle);
+ 
+@@ -287,7 +287,7 @@
+  * @info:          Information record
+  * Return:         0 on success or appropriate error number
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclGetDeviceInfo2(xclDeviceHandle handle, struct xclDeviceInfo2 *info);
+ 
+@@ -326,7 +326,7 @@
+  *
+  * This API also downloads OVERLAY (dtbo) section (Edge only).
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclLoadXclBin(xclDeviceHandle handle, const struct axlf *buffer);
+ 
+@@ -380,7 +380,7 @@
+  * Shared contexts can be concurrently allocated by many
+  * processes on the same compute units.
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclOpenContext(xclDeviceHandle handle, const xuid_t xclbinId, unsigned int ipIndex,
+                bool shared);
+@@ -395,7 +395,7 @@
+  *
+  * Close a previously allocated shared/exclusive context for a hardware IP.
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclCloseContext(xclDeviceHandle handle, const xuid_t xclbinId, unsigned int ipIndex);
+ 
+@@ -431,7 +431,7 @@
+  * @flags:         Specify bank information, etc
+  * Return:         BO handle
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ xclBufferHandle
+ xclAllocBO(xclDeviceHandle handle, size_t size,int unused, unsigned int flags);
+ 
+@@ -455,7 +455,7 @@
+  * @handle:        Device handle
+  * @boHandle:      BO handle
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ void
+ xclFreeBO(xclDeviceHandle handle, xclBufferHandle boHandle);
+ 
+@@ -509,7 +509,7 @@
+  * Map the contents of the buffer object into host memory
+  * To unmap the buffer call xclUnmapBO().
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ void*
+ xclMapBO(xclDeviceHandle handle, xclBufferHandle boHandle, bool write);
+ 
+@@ -520,7 +520,7 @@
+  * @boHandle:      BO handle
+  * @addr:          The mapped void * pointer returned from xclMapBO()
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclUnmapBO(xclDeviceHandle handle, xclBufferHandle boHandle, void* addr);
+ 
+@@ -538,7 +538,7 @@
+  * on the memory model this may require DMA to/from device or CPU
+  * cache flushing/invalidation
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclSyncBO(xclDeviceHandle handle, xclBufferHandle boHandle,
+           enum xclBOSyncDirection dir, size_t size, size_t offset);
+@@ -606,7 +606,7 @@
+  *
+  * This is the prefered method for obtaining BO property information.
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclGetBOProperties(xclDeviceHandle handle, xclBufferHandle boHandle,
+                    struct xclBOProperties *properties);
+@@ -640,7 +640,7 @@
+  * location specified. As stated before this API is for use by
+  * debuggers and profilers. Do not use it in your application.
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ ssize_t
+ xclUnmgdPread(xclDeviceHandle handle, unsigned int flags, void *buf,
+               size_t size, uint64_t offset);
+@@ -659,7 +659,7 @@
+  * location specified. As stated before this API is for use by
+  * debuggers and profilers. Do not use it in your application.
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ ssize_t
+ xclUnmgdPwrite(xclDeviceHandle handle, unsigned int flags, const void *buf,
+                size_t size, uint64_t offset);
+@@ -675,7 +675,7 @@
+  * defined by struct ert_packet which is defined in file *ert.h*. The
+  * BO should been allocated with DRM_XOCL_BO_EXECBUF flag.
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclExecBuf(xclDeviceHandle handle, xclBufferHandle cmdBO);
+ 
+@@ -694,7 +694,7 @@
+  * you may lose wakeup for some of them. So, use different handle in
+  * different threads.
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclExecWait(xclDeviceHandle handle, int timeoutMilliSec);
+ 
+@@ -710,7 +710,7 @@
+ 
+ /* Not supported */
+ XRT_DEPRECATED
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclLockDevice(xclDeviceHandle handle);
+ 
+@@ -886,7 +886,7 @@
+   * the first xclRegRead().
+   * This function returns error when called in an exclusive context.
+   */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclIPSetReadRange(xclDeviceHandle handle, uint32_t ipIndex, uint32_t start, uint32_t size);
+ 

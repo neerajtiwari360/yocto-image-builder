@@ -57,3 +57,10 @@ Local files are saved automatically to `artifacts/<release>/<target>/<version>/`
 All compilation occurs under `/work` on Linux storage. `/project` is a read-only source mount.
 Never remove the workspace volume unless you intend to delete builds, caches and exports.
 See [the structure guide](docs/project-structure.md) and [Docker setup](docs/docker-setup.md).
+
+## KV260 J7 camera and DPU image
+
+The separate `kv260-vision-minimal` target adds the AR1335/AP1302 J7 camera,
+SmartCam B3136 FPGA firmware and a headless VART/XIR inference runtime.
+Models are supplied later; no xmodel is baked into the image.
+See [camera/DPU build and deployment](docs/kv260-vision-minimal.md).

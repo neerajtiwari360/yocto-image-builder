@@ -1,0 +1,33 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] vart: pass explicit empty index vectors
+
+Avoid copying vectors known to be empty, preserving tensor indexing behavior
+and avoiding GCC 13 zero-size vector-copy bounds diagnostics.
+
+Upstream-Status: Pending
+---
+--- a/async-runner/src/batch_tensor_buffer.cpp
++++ b/async-runner/src/batch_tensor_buffer.cpp
+@@ -86,7 +86,7 @@
+ std::pair<uint64_t, size_t> BatchTensorBuffer::data(
+     const std::vector<int> idx) {
+   if (idx.empty()) {
+-    return tensor_buffers_[0]->data(idx);
++    return tensor_buffers_[0]->data(std::vector<int>{});
+   }
+   size_t tb_idx = 0u;
+   int batch = 0;
+--- a/dpu-controller/runner-assistant/src/batch_tensor_buffer.cpp
++++ b/dpu-controller/runner-assistant/src/batch_tensor_buffer.cpp
+@@ -106,9 +106,9 @@
+     const std::vector<int>& idx, int is_phy) {
+   if (idx.empty()) {
+     if (is_phy) {
+-      return tensor_buffers_[0]->data_phy(idx);
++      return tensor_buffers_[0]->data_phy(std::vector<int>{});
+     } else {
+-      return tensor_buffers_[0]->data(idx);
++      return tensor_buffers_[0]->data(std::vector<int>{});
+     }
+   }
+   auto tb_pair = get_tb_idx(idx[0]);

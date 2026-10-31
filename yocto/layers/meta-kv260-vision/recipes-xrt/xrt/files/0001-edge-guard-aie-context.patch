@@ -1,0 +1,40 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] edge: guard AI Engine hardware context operations
+
+Permit XRT_ENABLE_AIE-disabled builds on Zynq UltraScale+ devices.
+Preserve AI Engine behavior when enabled and reject unsupported reset calls.
+
+Upstream-Status: Pending
+---
+--- a/runtime_src/core/edge/user/hwctx_object.cpp
++++ b/runtime_src/core/edge/user/hwctx_object.cpp
+@@ -21,7 +21,11 @@
+ 	  , m_uuid(std::move(uuid))
+ 	  , m_slot_idx(slot_idx)
+ 	  , m_mode(mode)
++#ifdef XRT_ENABLE_AIE
+ 	  , m_info(xrt_core::edge::aie::get_partition_info(xrt_core::get_userpf_device(m_shim).get(), m_uuid))
++#else
++          , m_info{}
++#endif
+ {}
+ 
+ #ifdef XRT_ENABLE_AIE
+@@ -130,6 +134,7 @@
+ void
+ hwctx_object::reset_array() const
+ {
++#ifdef XRT_ENABLE_AIE
+   if (!m_aie_array)
+     throw xrt_core::error(-EINVAL, "No AIE present in hw_context to reset");
+ 
+@@ -138,6 +143,9 @@
+     m_aie_array->open_context(device.get(), xrt::aie::access_mode::primary);
+ 
+   m_aie_array->reset(device.get(), m_slot_idx, m_info.partition_id);
++#else
++  throw xrt_core::error(std::errc::not_supported, __func__);
++#endif
+ }
+ 
+ }

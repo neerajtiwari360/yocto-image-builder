@@ -1,0 +1,517 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] vart: include integer definitions in headers that use them
+
+Avoid dependence on incidental standard library includes with GCC 13.
+
+Upstream-Status: Pending
+---
+--- a/async-runner/src/batch_tensor_buffer.hpp
++++ b/async-runner/src/batch_tensor_buffer.hpp
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <xir/tensor/tensor.hpp>
+ 
+ #include "vart/tensor_buffer.hpp"
+--- a/buffer-object/include/xir/buffer_object.hpp
++++ b/buffer-object/include/xir/buffer_object.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <functional>
+ #include <memory>
+ #include <vitis/ai/with_injection.hpp>
+--- a/buffer-object/include/xir/device_memory.hpp
++++ b/buffer-object/include/xir/device_memory.hpp
+@@ -15,6 +15,7 @@
+  */
+ 
+ #pragma once
++#include <cstdint>
+ #include <string>
+ #include <vitis/ai/with_injection.hpp>
+ 
+--- a/buffer-object/src/device_memory_cloud.hpp
++++ b/buffer-object/src/device_memory_cloud.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <xrt.h>
+ #include "xir/device_memory.hpp"
+ namespace {
+--- a/buffer-object/src/device_memory_edge.hpp
++++ b/buffer-object/src/device_memory_edge.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include "xir/device_memory.hpp"
+ namespace {
+ class DeviceMemoryEdge : public xir::DeviceMemory {
+--- a/dpu-controller/include/xir/dpu_controller.hpp
++++ b/dpu-controller/include/xir/dpu_controller.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <functional>
+ #include <memory>
+ #include <string>
+--- a/dpu-controller/include/xir/sfm_controller.hpp
++++ b/dpu-controller/include/xir/sfm_controller.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <functional>
+ #include <memory>
+ #include <string>
+--- a/dpu-controller/runner-assistant/include/vart/assistant/batch_tensor_buffer.hpp
++++ b/dpu-controller/runner-assistant/include/vart/assistant/batch_tensor_buffer.hpp
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <xir/tensor/tensor.hpp>
+ 
+ #include "vart/tensor_buffer.hpp"
+--- a/dpu-controller/runner-assistant/include/vart/assistant/xrt_bo_tensor_buffer.hpp
++++ b/dpu-controller/runner-assistant/include/vart/assistant/xrt_bo_tensor_buffer.hpp
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <xir/tensor/tensor.hpp>
+ 
+ #include "vart/tensor_buffer.hpp"
+--- a/dpu-controller/runner-assistant/src/tensor_buffer_imp_host.hpp
++++ b/dpu-controller/runner-assistant/src/tensor_buffer_imp_host.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <vart/tensor_buffer.hpp>
+--- a/dpu-controller/runner-assistant/src/tensor_buffer_imp_host_phy.hpp
++++ b/dpu-controller/runner-assistant/src/tensor_buffer_imp_host_phy.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ #include <vart/tensor_buffer.hpp>
+ #include <xir/buffer_object.hpp>
+--- a/dpu-controller/runner-assistant/src/tensor_buffer_imp_view.hpp
++++ b/dpu-controller/runner-assistant/src/tensor_buffer_imp_view.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <vart/tensor_buffer.hpp>
+--- a/dpu-controller/src/dpu_control_xrt_cloud.hpp
++++ b/dpu-controller/src/dpu_control_xrt_cloud.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ 
+ #include "./dpu_cloud.hpp"
+--- a/dpu-controller/src/dpu_control_xrt_edge.hpp
++++ b/dpu-controller/src/dpu_control_xrt_edge.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ 
+ #include "./xrt_cu.hpp"
+--- a/dpu-controller/src/dpu_control_xrt_xv2_dpu.hpp
++++ b/dpu-controller/src/dpu_control_xrt_xv2_dpu.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ 
+ #include "./xrt_cu.hpp"
+--- a/dpu-controller/src/dpu_control_xrt_xv_dpu.hpp
++++ b/dpu-controller/src/dpu_control_xrt_xv_dpu.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ 
+ #include "./xrt_cu.hpp"
+--- a/dpu-controller/src/dpu_controller_dnndk.hpp
++++ b/dpu-controller/src/dpu_controller_dnndk.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ 
+ #include "xir/dpu_controller.hpp"
+--- a/dpu-controller/src/dpu_controller_qnx.hpp
++++ b/dpu-controller/src/dpu_controller_qnx.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include "vitis/ai/qnx_dpu.h"
+ #include "xir/dpu_controller.hpp"
+ #include <memory>
+--- a/dpu-controller/src/sfm_control_xrt_edge.hpp
++++ b/dpu-controller/src/sfm_control_xrt_edge.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ #include <mutex>
+ #include <xir/buffer_object.hpp>
+--- a/dpu-controller/src/xrt_cu.hpp
++++ b/dpu-controller/src/xrt_cu.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <xrt.h>
+ 
+ #include <cstdlib>
+--- a/dpu-runner/src/dpu_kernel.hpp
++++ b/dpu-runner/src/dpu_kernel.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <functional>
+ #include <vector>
+ #include <vitis/ai/with_injection.hpp>
+--- a/dpu-runner/src/dpu_runner_base_imp.hpp
++++ b/dpu-runner/src/dpu_runner_base_imp.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ #include <vart/runner.hpp>
+ #include <xir/device_memory.hpp>
+--- a/dpu-runner/src/imp/dpu_kernel_ddr.hpp
++++ b/dpu-runner/src/imp/dpu_kernel_ddr.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <xir/buffer_object.hpp>
+ #include <xir/dpu_controller.hpp>
+ 
+--- a/dpu-runner/src/imp/dpu_kernel_hbm.hpp
++++ b/dpu-runner/src/imp/dpu_kernel_hbm.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <memory>
+ #include <xir/device_memory.hpp>
+ #include <xir/dpu_controller.hpp>
+--- a/dpu-runner/src/imp/dpu_runner_ddr.hpp
++++ b/dpu-runner/src/imp/dpu_runner_ddr.hpp
+@@ -13,6 +13,7 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
++#include <cstdint>
+ #include <memory>
+ 
+ #include "../dpu_runner_base_imp.hpp"
+--- a/dpu-runner/src/imp/dpu_runner_hbm.hpp
++++ b/dpu-runner/src/imp/dpu_runner_hbm.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <cstdint>
+ #include <memory>
+ #include <xir/device_memory.hpp>
+ 
+--- a/mem-manager/include/vart/mm/host_flat_tensor_buffer.hpp
++++ b/mem-manager/include/vart/mm/host_flat_tensor_buffer.hpp
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include "vart/tensor_buffer.hpp"
+ 
+ #include <xir/tensor/tensor.hpp>
+--- a/runner/include/vart/runner.hpp
++++ b/runner/include/vart/runner.hpp
+@@ -15,6 +15,7 @@
+  */
+ #pragma once
+ 
++#include <cstdint>
+ #include <cstring>
+ #include <memory>
+ #include <string>
+--- a/runner/include/vart/tensor_buffer_unowned_device.hpp
++++ b/runner/include/vart/tensor_buffer_unowned_device.hpp
+@@ -15,6 +15,7 @@
+  */
+ #pragma once
+ 
++#include <cstdint>
+ #include "vart/tensor_buffer.hpp"
+ 
+ namespace vart {
+--- a/runner/include/vitis/ai/dpu_runner.hpp
++++ b/runner/include/vitis/ai/dpu_runner.hpp
+@@ -15,6 +15,7 @@
+  */
+ #pragma once
+ 
++#include <cstdint>
+ #include <cstring>
+ #include <memory>
+ #include <vector>
+--- a/runner/include/vitis/ai/tensor.hpp
++++ b/runner/include/vitis/ai/tensor.hpp
+@@ -15,6 +15,7 @@
+  */
+ #pragma once
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 
+--- a/runner/include/vitis/ai/tensor_buffer.hpp
++++ b/runner/include/vitis/ai/tensor_buffer.hpp
+@@ -15,6 +15,7 @@
+  */
+ #pragma once
+ 
++#include <cstdint>
+ #include "./tensor.hpp"
+ 
+ namespace vitis {
+--- a/runner/src/runner_helper.hpp
++++ b/runner/src/runner_helper.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <vector>
+ 
+ #include "vart/runner.hpp"
+--- a/runner/v1.1/runner_adaptor.hpp
++++ b/runner/v1.1/runner_adaptor.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <glog/logging.h>
+ 
+ #include <unordered_map>
+--- a/runner/v1.1/tensor_buffer_adaptor.hpp
++++ b/runner/v1.1/tensor_buffer_adaptor.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <xir/attrs/attrs.hpp>
+ #include <xir/graph/graph.hpp>
+ 
+--- a/softmax-runner/include/vart/softmax_runner.hpp
++++ b/softmax-runner/include/vart/softmax_runner.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <cstdint>
+ #include <memory>
+ 
+ #include "vart/runner_ext.hpp"
+--- a/softmax-runner-cpu/include/vart/softmax_runner_cpu.hpp
++++ b/softmax-runner-cpu/include/vart/softmax_runner_cpu.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <cstdint>
+ #include <memory>
+ 
+ #include "vart/runner_ext.hpp"
+--- a/trace/include/vitis/ai/event.hpp
++++ b/trace/include/vitis/ai/event.hpp
+@@ -15,6 +15,7 @@
+  */
+ 
+ #pragma once
++#include <cstdint>
+ #include <stdlib.h>
+ #include <iostream>
+ #include <map>
+--- a/trace/include/vitis/ai/payload.hpp
++++ b/trace/include/vitis/ai/payload.hpp
+@@ -15,6 +15,7 @@
+  */
+ 
+ #pragma once
++#include <cstdint>
+ #include <stdlib.h>
+ #include <iostream>
+ #include <map>
+--- a/trace/include/vitis/ai/traceclass.hpp
++++ b/trace/include/vitis/ai/traceclass.hpp
+@@ -15,6 +15,7 @@
+  */
+ 
+ #pragma once
++#include <cstdint>
+ #include <assert.h>
+ #include <stdlib.h>
+ #include <algorithm>
+--- a/trace/src/str.hpp
++++ b/trace/src/str.hpp
+@@ -15,6 +15,7 @@
+  */
+ 
+ #pragma once
++#include <cstdint>
+ #include <assert.h>
+ #include <stdlib.h>
+ #include <chrono>
+--- a/util/include/vart/tensor_mirror_attrs.hpp
++++ b/util/include/vart/tensor_mirror_attrs.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <cstdint>
+ #include "xir/tensor/tensor.hpp"
+ namespace vart {
+ class TensorMirrorAttrs : public xir::Tensor {
+--- a/util/include/vitis/ai/dim_calc.hpp
++++ b/util/include/vitis/ai/dim_calc.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <cstdlib>
+ #include <map>
+ #include <vector>
+--- a/util/include/vitis/ai/erl_msg_box.hpp
++++ b/util/include/vitis/ai/erl_msg_box.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <glog/logging.h>
+ 
+ #include <cassert>
+--- a/util/include/vitis/ai/parse_value.hpp
++++ b/util/include/vitis/ai/parse_value.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <cassert>
+ #include <sstream>
+ namespace vitis {
+--- a/xrnn-runner/src/xrnn_controller.hpp
++++ b/xrnn-runner/src/xrnn_controller.hpp
+@@ -13,6 +13,7 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
++#include <cstdint>
+ #include "xrnn_hw.hpp"
+ //#include "xrnn_xrt_cu.hpp"
+ #include "xrt_cu.hpp"
+--- a/xrt-device-handle/include/xir/xrt_device_handle.hpp
++++ b/xrt-device-handle/include/xir/xrt_device_handle.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <glog/logging.h>
+ 
+ #include <cstring>
+--- a/xrt-device-handle/src/xrt_bin_stream.hpp
++++ b/xrt-device-handle/src/xrt_bin_stream.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <xclbin.h>
+ #include <xrt.h>
+ 
+--- a/xrt-device-handle/src/xrt_device_handle_butler.hpp
++++ b/xrt-device-handle/src/xrt_device_handle_butler.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <glog/logging.h>
+ 
+ #include <cstring>
+--- a/xrt-device-handle/src/xrt_device_handle_imp.hpp
++++ b/xrt-device-handle/src/xrt_device_handle_imp.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <glog/logging.h>
+ 
+ #include <cstring>
+--- a/xrt-device-handle/src/xrt_xcl_read.hpp
++++ b/xrt-device-handle/src/xrt_xcl_read.hpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ #pragma once
++#include <cstdint>
+ #include <xrt.h>
+ 
+ static int xrtXclRead(xclDeviceHandle handle, uint32_t ipIndex, uint64_t offset,

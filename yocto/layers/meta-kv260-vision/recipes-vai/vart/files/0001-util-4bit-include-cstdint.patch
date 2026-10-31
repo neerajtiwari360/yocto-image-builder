@@ -1,0 +1,22 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] vart: include cstdint in 4-bit utility header
+
+Declare the fixed-width integer types directly instead of relying on
+transitive standard-library includes with GCC 13.
+
+Upstream-Status: Pending
+---
+ util/include/vart/util_4bit.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/util/include/vart/util_4bit.hpp b/util/include/vart/util_4bit.hpp
+--- a/util/include/vart/util_4bit.hpp
++++ b/util/include/vart/util_4bit.hpp
+@@ -16,6 +16,7 @@
+ #pragma once
+ 
++#include <cstdint>
+ #include <iomanip>
+ #include <iostream>
+ #include <sstream>
+ #include <string>

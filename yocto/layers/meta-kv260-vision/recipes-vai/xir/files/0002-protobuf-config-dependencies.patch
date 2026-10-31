@@ -1,0 +1,24 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] xir: use protobuf config dependencies and host protoc
+
+Use exported protobuf dependencies, including Abseil, with modern protobuf.
+Keep generated code compilation on the target and protoc execution on the host.
+
+Upstream-Status: Pending
+---
+ CMakeLists.txt | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,1 +40,8 @@
+-find_package(Protobuf REQUIRED)
++set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "Enable legacy protobuf helpers" FORCE)
++find_package(Protobuf CONFIG REQUIRED)
++if(NOT TARGET protobuf::protoc)
++  add_executable(protobuf::protoc IMPORTED)
++endif()
++set_target_properties(protobuf::protoc PROPERTIES
++  IMPORTED_LOCATION "${XIR_HOST_PROTOC}"
++  IMPORTED_LOCATION_NOCONFIG "${XIR_HOST_PROTOC}")

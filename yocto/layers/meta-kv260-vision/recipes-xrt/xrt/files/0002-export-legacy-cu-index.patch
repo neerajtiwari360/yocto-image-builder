@@ -1,0 +1,24 @@
+From: KV260 image builder <builder@localhost>
+Subject: [PATCH] xrt: retain xclIPName2Index export for VART 3.5
+
+VART 3.5 uses this two-argument edge API for compute-unit discovery.
+XRT 2.18 retains its implementation but hides its C symbol. Restore only
+this export for the pinned VART compatibility integration.
+
+Upstream-Status: Inappropriate [VART 3.5 compatibility]
+---
+ runtime_src/core/include/deprecated/xrt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/runtime_src/core/include/deprecated/xrt.h b/runtime_src/core/include/deprecated/xrt.h
+--- a/runtime_src/core/include/deprecated/xrt.h
++++ b/runtime_src/core/include/deprecated/xrt.h
+@@ -623,7 +623,7 @@
+  *
+  */
+-XCL_DRIVER_DLLHIDDEN
++XCL_DRIVER_DLLESPEC
+ int
+ xclIPName2Index(xclDeviceHandle handle, const char *ipName);
+ 
+ /*

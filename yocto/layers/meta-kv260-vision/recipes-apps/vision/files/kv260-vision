@@ -1,0 +1,44 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          kv260-vision
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Load KV260 SmartCam FPGA and configure J7 AR1335 camera
+### END INIT INFO
+set -eu
+WIDTH=1280
+HEIGHT=720
+AUTORUN=no
+[ ! -r /etc/default/kv260-vision ] || . /etc/default/kv260-vision
+case "${1:-}" in
+start)
+    mkdir -p /run /var/log
+    modprobe zocl
+    grep -qs ' /sys/kernel/config configfs ' /proc/mounts || mount -t configfs configfs /sys/kernel/config
+    overlay=/sys/kernel/config/device-tree/overlays/kv260-smartcam
+    if [ ! -d "$overlay" ]; then
+        mkdir "$overlay"
+        cat /lib/firmware/xilinx/kv260-smartcam/kv260-smartcam.dtbo > "$overlay/dtbo"
+    fi
+    if ! /usr/bin/kv260-camera-setup --width "$WIDTH" --height "$HEIGHT" --smoke-frames 3 > /var/log/kv260-camera.log 2>&1; then
+        echo 'KV260 camera setup failed; see /var/log/kv260-camera.log and dmesg.' >&2
+        exit 1
+    fi
+    echo 'KV260 SmartCam loaded; J7 camera captured three frames.'
+    if [ "$AUTORUN" = yes ]; then
+        test -x /opt/yunet/run.sh
+        start-stop-daemon -S -b -m -p /run/kv260-infer.pid -x /usr/bin/kv260-infer
+    fi
+    ;;
+stop)
+    if [ -f /run/kv260-infer.pid ]; then
+        start-stop-daemon -K -p /run/kv260-infer.pid || true
+        rm -f /run/kv260-infer.pid
+    fi
+    # Retain the loaded overlay until reboot; avoid removing active camera devices.
+    ;;
+restart) "$0" stop; "$0" start ;;
+*) echo "Usage: $0 {start|stop|restart}"; exit 2 ;;
+esac
