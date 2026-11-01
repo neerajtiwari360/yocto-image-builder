@@ -13,8 +13,8 @@ SmartCam xclbin successfully; its dynamic-region report exposed
 both idle. On 2026-11-01 the regenerated image passed its automatic camera
 startup test, and the matching YuNet model executed successfully on the DPU.
 A live 30-frame test returned face boxes and five landmarks in 28 frames.
-See D:/Github/FaceGuard/kv260-yunet/docs/END-TO-END.md for the complete model,
-native application build, deployment and live-run workflow.
+See D:/Github/FaceGuard/kv260-yunet/README.md for the maintained board source,
+matching model, application build, deployment and live-run commands.
 
 Connect the AR1335 IAS module to **J7**, with board power disconnected while
 moving it. J8 is the direct sensor interface and is not routed through the
@@ -57,12 +57,12 @@ The optimized native application and matching model are now included by the
 cached-NV12 preprocessing path sustained about 30 fps on the existing board,
 compared with the previous 2.9 fps full-frame conversion path. Detailed timings
 and byte-parity checks are documented in
-D:/Github/FaceGuard/kv260-yunet/docs/OPTIMIZATION.md.
+D:/Github/FaceGuard/kv260-yunet/README.md; the historical performance reports
+were backed up outside the code-only folder.
 
-The SDK and native application build scripts are in
-D:/Github/FaceGuard/kv260-yunet/runtime/yocto. Build the SDK from the same image
-metadata and use that SDK/sysroot for the ARM64 C/C++ application.
-See the native application's README for cross-build and packaging commands.
+The native application build helper is
+D:/Github/FaceGuard/kv260-yunet/tools/Build-Runtime.ps1. It uses this image's
+Yocto compiler and VART/XIR sysroot; no standalone SDK installation is required.
 
 On a new image, run directly (no separate application transfer is required):
 
