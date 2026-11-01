@@ -10,8 +10,11 @@ capture passed for three frames and then 90 frames at 1280x720 NV12, reporting
 not neural-network inference. `xrt-smi program` also loaded the installed
 SmartCam xclbin successfully; its dynamic-region report exposed
 `DPUCZDX8G:DPUCZDX8G_1` at `0xa0010000` and the preprocessing CU at `0xa0020000`,
-both idle. The regenerated image still needs a fresh boot test after flashing;
-DPU model execution remains unverified.
+both idle. On 2026-11-01 the regenerated image passed its automatic camera
+startup test, and the matching YuNet model executed successfully on the DPU.
+A live 30-frame test returned face boxes and five landmarks in 28 frames.
+See D:/Github/FaceGuard/kv260-yunet/docs/END-TO-END.md for the complete model,
+native application build, deployment and live-run workflow.
 
 Connect the AR1335 IAS module to **J7**, with board power disconnected while
 moving it. J8 is the direct sensor interface and is not routed through the
@@ -50,7 +53,7 @@ docker compose run --rm builder bash /project/scripts/image.sh kv260-vision-mini
 ```
 
 The SDK and native application build scripts are in
-D:/Github/FaceGuard/yunet-kv260-native/yocto. Build the SDK from the same image
+D:/Github/FaceGuard/kv260-yunet/runtime/yocto. Build the SDK from the same image
 metadata and use that SDK/sysroot for the ARM64 C/C++ application.
 See the native application's README for cross-build and packaging commands.
 
