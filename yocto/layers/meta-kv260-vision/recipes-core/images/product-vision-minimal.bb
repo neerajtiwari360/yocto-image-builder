@@ -1,7 +1,7 @@
 require recipes-core/images/core-image-minimal.bb
 SUMMARY = "Headless KV260 J7 AP1302/AR1335 camera and Vitis AI runtime"
 IMAGE_FEATURES:remove = "tools-sdk dev-pkgs package-management read-only-rootfs"
-IMAGE_INSTALL:append = " board-projects kv260-smartcam-hardware ap1302-ar1335-firmware kv260-vision-runtime vart xir media-ctl v4l-utils zocl"
+IMAGE_INSTALL:append = " board-projects kv260-smartcam-hardware ap1302-ar1335-firmware kv260-vision-runtime kv260-yunet vart xir media-ctl v4l-utils zocl"
 do_image_wic[depends] += "kv260-boot-script:do_deploy virtual/kernel:do_deploy"
 ROOTFS_POSTPROCESS_COMMAND += "verify_vision_rootfs; "
 python verify_vision_rootfs() {
@@ -11,6 +11,12 @@ python verify_vision_rootfs() {
         if not (root / item).is_file():
             bb.fatal('Missing vision runtime asset: ' + item)
     expected_firmware = '/lib/firmware/xilinx/kv260-smartcam/kv260-smartcam.xclbin'
+    for item in ('opt/yunet/bin/yunet-kv260', 'opt/yunet/run.sh', 'opt/yunet/config/yunet.conf', 'opt/yunet/model/yunet_smartcam.xmodel'):
+        if not (root / item).is_file():
+            bb.fatal('Missing native inference asset: ' + item)
+    import hashlib
+    if hashlib.sha256((root / 'opt/yunet/model/yunet_smartcam.xmodel').read_bytes()).hexdigest() != '39bb7312515e3fb350676681571152ed6c0a34afaba850a385d69ee01e3f2752':
+        bb.fatal('YuNet model differs from the verified SmartCam model')
     if (root / 'etc/vart.conf').read_text().strip() != 'firmware: ' + expected_firmware:
         bb.fatal('VART must use the installed SmartCam xclbin')
     # Installed alternatives may be absolute symlinks, which cannot be followed

@@ -62,5 +62,6 @@ See [the structure guide](docs/project-structure.md) and [Docker setup](docs/doc
 
 The separate `kv260-vision-minimal` target adds the AR1335/AP1302 J7 camera,
 SmartCam B3136 FPGA firmware and a headless VART/XIR inference runtime.
-Models are supplied later; no xmodel is baked into the image.
+The image includes the optimized native YuNet runtime and the verified SmartCam
+B3136 model. Run `kv260-infer --frames 300` after boot; autorun is disabled by default.
 See [camera/DPU build and deployment](docs/kv260-vision-minimal.md).

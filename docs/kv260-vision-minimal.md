@@ -52,12 +52,19 @@ Build on the laptop:
 docker compose run --rm builder bash /project/scripts/image.sh kv260-vision-minimal build
 ```
 
+The optimized native application and matching model are now included by the
+`kv260-yunet` recipe under `/opt/yunet`. The 320x320 model is unchanged; the fused
+cached-NV12 preprocessing path sustained about 30 fps on the existing board,
+compared with the previous 2.9 fps full-frame conversion path. Detailed timings
+and byte-parity checks are documented in
+D:/Github/FaceGuard/kv260-yunet/docs/OPTIMIZATION.md.
+
 The SDK and native application build scripts are in
 D:/Github/FaceGuard/kv260-yunet/runtime/yocto. Build the SDK from the same image
 metadata and use that SDK/sysroot for the ARM64 C/C++ application.
 See the native application's README for cross-build and packaging commands.
 
-Extract the native deployment package under /opt/yunet on the board, then run:
+On a new image, run directly (no separate application transfer is required):
 
 ```sh
 kv260-infer --frames 300
@@ -67,6 +74,8 @@ The package contains bin/yunet-kv260, run.sh, config/yunet.conf, the matching
 model, and required runtime libraries. The C code converts NV12 to BGR,
 letterboxes and quantizes the input, then decodes detections and runs NMS.
 A minimal C++ wrapper invokes the DPU through VART. No Python inference is used.
+For subsequent source changes in FaceGuard, run its `tools/sync_image.py` before
+rebuilding this OS image. The recipe validates the exact compiled model SHA256.
 
 Inspect /var/log/kv260-camera.log and /run/kv260-camera.conf for camera startup.
 For a manual repeat of camera initialization and capture:
