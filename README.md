@@ -70,3 +70,8 @@ The optional [`kv260-vision-hdmi` target](docs/kv260-vision-hdmi.md) adds system
 and an independent DRM/KMS preview on CPU3. Camera-only video starts at boot;
 starting YuNet adds face boxes and five landmarks. It reuses the existing PS
 display hardware and SmartCam bitstream. ML inference remains manually controlled.
+In the board's PuTTY console, log in as `root` and run
+`systemctl start yunet-inference` to turn AI on or
+`systemctl stop yunet-inference` to turn it off. Camera preview continues while
+AI is off. See the HDMI guide for connection settings, status checks and the
+verified boot-mount fix.

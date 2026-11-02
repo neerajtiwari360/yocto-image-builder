@@ -18,7 +18,19 @@ camera-only video while inference is off and yields the camera at ML startup.
 During inference it reads paired frames/detections from a bounded nonblocking
 shared-memory mailbox; preview never holds inference's DMA camera buffers.
 
-From laptop PowerShell, synchronize the maintained runtime and build:
+## Build and export the image
+
+To rebuild with the current checked-in runtime snapshot (including the boot
+mount fix), run this in laptop PowerShell:
+
+```powershell
+cd D:\Github\yocto-image-builder
+docker compose run --rm builder bash /project/scripts/image.sh kv260-vision-hdmi build
+```
+
+This builds and exports the image to the timestamped artifacts directory below.
+If the maintained FaceGuard application source has changed, synchronize it first
+and optionally use the detached build workflow:
 
 ```powershell
 cd D:\Github\FaceGuard\kv260-yunet
@@ -37,7 +49,26 @@ timestamped directories. Flashing replaces the SD contents; this target uses
 the board's existing compatible QSPI firmware.
 
 The optional image starts **camera-only HDMI video at boot**, without logging in
-on HDMI or UART. ML remains off until explicitly started. Board commands:
+on HDMI or UART. ML remains off until explicitly started.
+
+## Turn AI on and off through PuTTY
+
+Open the board's serial console in PuTTY (COM7 on the validated laptop,
+115200 baud, 8 data bits, no parity, 1 stop bit, no flow control). Log in as
+`root`. Type these commands at the board shell, not in laptop PowerShell:
+
+```sh
+systemctl start yunet-inference   # AI ON: face boxes and five landmarks
+systemctl stop yunet-inference    # AI OFF: camera-only preview resumes
+systemctl is-active yunet-inference
+```
+
+Run the start or stop command as needed. The status command prints `active`
+when AI is on, `inactive` when it is off, or `failed` if the service failed.
+Starting AI this way applies to the current boot; after reboot, camera-only
+preview starts and AI remains off until started again.
+
+Other board diagnostics and preview controls:
 
 ```sh
 systemctl status kv260-vision
@@ -61,14 +92,14 @@ Hardware validation on the existing SysV board confirmed Windows Camera live
 video, boxes/landmarks, camera-only/ML handoff and preview crash/restart isolation.
 The user also confirmed automatic live video after reboot. A 600-frame OFF/ON/OFF
 comparison measured approximately 30.071/30.058/30.066 steady inference fps at the
-15 fps preview cap. These tests used the deployed native package on that board;
-a newly generated systemd image still requires its own physical boot test.
+15 fps preview cap. These performance measurements used the deployed native
+package on that SysV board, rather than the newly flashed systemd image.
 
 On 2026-11-02, the flashed systemd image entered emergency mode because WIC
 generated `/dev/mmcblkp1` for the `/boot` fstab entry, while Linux exposed the SD
 as `/dev/mmcblk1`. The shared WKS now requests `--use-uuid` for the boot
-partition, as it already does for root. Rebuild the image to include this fix;
-existing exported images retain the defective fstab.
+partition, as it already does for root. Images exported before this fix retain
+the defective fstab; rebuild to include the correction.
 
 The installed SD was repaired in place using its FAT filesystem UUID in fstab
 (with the original saved as `/etc/fstab.before-boot-fix`). After a reboot,
@@ -77,6 +108,15 @@ three-frame camera startup and active split HDMI preview. A bounded 60-frame
 native inference run completed and preview returned to camera-only mode.
 That SD does not need reflashing for this fix. Kernel stream-transition and
 older-QSPI pinctrl warnings remain; this is not a warning-free boot.
+
+The user subsequently rebuilt, flashed and booted a new image and confirmed
+the two-panel HDMI preview appeared automatically. A UART check reported
+systemd `running`, with `kv260-vision` and `yunet-hdmi` active. Starting
+`yunet-inference` succeeded: all three services were active, the runtime logged
+1280x720 NV12 camera initialization, and the HDMI journal confirmed camera
+handoff to inference. This verifies startup and service handoff on the new
+image; no new sustained performance or positive face-detection accuracy test
+was recorded for that flash.
 
 The rootfs check validates HDMI enablement links without following their absolute
 Linux paths on the build host. It also checks that their unit targets exist
