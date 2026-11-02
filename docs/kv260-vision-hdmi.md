@@ -8,6 +8,11 @@ exposes a DRM DP connector feeding the carrier's HDMI J5 splitter.
 
 The maintained source, ownership protocol, deployment instructions and measured
 results are in the [YuNet HDMI guide](../../FaceGuard/kv260-yunet/HDMI.md).
+The [module and component-update guide](../../FaceGuard/kv260-yunet/MODULES.md)
+maps the separate HDMI, preprocessing, DPU inference and postprocessing source
+folders and their independent HDMI-only / ML-only build and deployment commands.
+Image recipes consume a generated source snapshot; application code is maintained
+in FaceGuard rather than edited inside the image archive or Docker workspace.
 `yunet-hdmi` is a separate process pinned to CPU3 with nice 10. It captures
 camera-only video while inference is off and yields the camera at ML startup.
 During inference it reads paired frames/detections from a bounded nonblocking
