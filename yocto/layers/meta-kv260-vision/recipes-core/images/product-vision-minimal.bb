@@ -7,7 +7,7 @@ ROOTFS_POSTPROCESS_COMMAND += "verify_vision_rootfs; "
 python verify_vision_rootfs() {
     import pathlib
     root = pathlib.Path(d.getVar('IMAGE_ROOTFS'))
-    for item in ('lib/firmware/ap1302_ar1335_single_fw.bin', 'lib/firmware/kv260-smartcam.bit.bin', 'lib/firmware/xilinx/kv260-smartcam/kv260-smartcam.dtbo', 'lib/firmware/xilinx/kv260-smartcam/kv260-smartcam.xclbin', 'usr/bin/media-ctl', 'usr/bin/v4l2-ctl', 'usr/bin/kv260-camera-setup', 'usr/bin/kv260-infer', 'etc/init.d/kv260-vision', 'etc/vart.conf'):
+    for item in ('lib/firmware/ap1302_ar1335_single_fw.bin', 'lib/firmware/kv260-smartcam.bit.bin', 'lib/firmware/xilinx/kv260-smartcam/kv260-smartcam.dtbo', 'lib/firmware/xilinx/kv260-smartcam/kv260-smartcam.xclbin', 'usr/bin/media-ctl', 'usr/bin/v4l2-ctl', 'usr/bin/kv260-camera-setup', 'usr/bin/kv260-infer', 'usr/libexec/kv260-vision/boot.sh', 'etc/vart.conf'):
         if not (root / item).is_file():
             bb.fatal('Missing vision runtime asset: ' + item)
     expected_firmware = '/lib/firmware/xilinx/kv260-smartcam/kv260-smartcam.xclbin'
@@ -19,6 +19,18 @@ python verify_vision_rootfs() {
         bb.fatal('YuNet model differs from the verified SmartCam model')
     if (root / 'etc/vart.conf').read_text().strip() != 'firmware: ' + expected_firmware:
         bb.fatal('VART must use the installed SmartCam xclbin')
+    if d.getVar('YUNET_HDMI_IMAGE') == '1':
+        for item in ('opt/yunet/bin/yunet-hdmi', 'usr/bin/systemctl',
+                     'usr/lib/systemd/system/yunet-hdmi.service',
+                     'usr/lib/systemd/system/kv260-vision.service',
+                     'etc/default/yunet-hdmi'):
+            if not (root / item).is_file():
+                bb.fatal('Missing optional HDMI/systemd asset: ' + item)
+        enabled = list(root.glob('etc/systemd/system/*.wants/yunet-hdmi.service'))
+        if bool(enabled) != (d.getVar('YUNET_HDMI_AUTOSTART') == '1'):
+            bb.fatal('HDMI preview boot policy differs from YUNET_HDMI_AUTOSTART')
+        if list(root.glob('etc/systemd/system/*.wants/yunet-inference.service')):
+            bb.fatal('ML inference must remain manually controlled')
     # Installed alternatives may be absolute symlinks, which cannot be followed
     # with Path.is_file() from the build host. Check the link itself as well.
     if not any((root / directory / 'timeout').exists() or (root / directory / 'timeout').is_symlink()

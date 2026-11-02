@@ -65,3 +65,8 @@ SmartCam B3136 FPGA firmware and a headless VART/XIR inference runtime.
 The image includes the optimized native YuNet runtime and the verified SmartCam
 B3136 model. Run `kv260-infer --frames 300` after boot; autorun is disabled by default.
 See [camera/DPU build and deployment](docs/kv260-vision-minimal.md).
+
+The optional [`kv260-vision-hdmi` target](docs/kv260-vision-hdmi.md) adds systemd
+and an independent DRM/KMS preview on CPU3. Camera-only video starts at boot;
+starting YuNet adds face boxes and five landmarks. It reuses the existing PS
+display hardware and SmartCam bitstream. ML inference remains manually controlled.

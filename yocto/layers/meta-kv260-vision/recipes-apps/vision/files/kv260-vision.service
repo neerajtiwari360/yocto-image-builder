@@ -1,0 +1,14 @@
+[Unit]
+Description=Load SmartCam FPGA and configure the J7 AR1335 camera
+After=systemd-modules-load.service local-fs.target
+Before=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/kv260-vision/boot.sh start
+ExecStop=/usr/libexec/kv260-vision/boot.sh stop
+RemainAfterExit=yes
+TimeoutStartSec=90
+
+[Install]
+WantedBy=multi-user.target
