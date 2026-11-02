@@ -9,3 +9,7 @@
 /tmp/
 /python3-install.log
 /.research/
+
+# Python verification helpers.
+__pycache__/
+*.py[cod]

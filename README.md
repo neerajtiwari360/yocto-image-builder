@@ -75,3 +75,11 @@ In the board's PuTTY console, log in as `root` and run
 `systemctl stop yunet-inference` to turn it off. Camera preview continues while
 AI is off. See the HDMI guide for connection settings, status checks and the
 verified boot-mount fix.
+
+The [FaceGuard architecture review](docs/faceguard-architecture-review.md) maps
+the two repositories, component interfaces and migration risks. See
+[migration results](docs/faceguard-migration-results.md) for the host tests,
+ARM64 build validation and remaining hardware acceptance work.
+
+The [KV260-only cleanup record](docs/project-cleanup.md) lists archived legacy
+pipelines and experiments, retained dependencies and recovery information.

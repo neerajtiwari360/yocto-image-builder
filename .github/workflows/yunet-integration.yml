@@ -1,0 +1,17 @@
+name: YuNet source integration
+on: [push, pull_request]
+jobs:
+  pinned-source:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/verify-yunet-source.py
+      - run: python scripts/test-yunet-source.py
+      - name: Exercise image boot policy using the pinned model
+        run: |
+          mkdir -p "$RUNNER_TEMP/yunet-source"
+          tar -xzf yocto/layers/meta-kv260-vision/recipes-apps/yunet/files/runtime.tar.gz -C "$RUNNER_TEMP/yunet-source"
+          python scripts/test-vision-boot-policy.py --model "$RUNNER_TEMP/yunet-source/runtime/model/yunet_smartcam.xmodel"
