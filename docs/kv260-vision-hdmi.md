@@ -63,3 +63,26 @@ The user also confirmed automatic live video after reboot. A 600-frame OFF/ON/OF
 comparison measured approximately 30.071/30.058/30.066 steady inference fps at the
 15 fps preview cap. These tests used the deployed native package on that board;
 a newly generated systemd image still requires its own physical boot test.
+
+On 2026-11-02, the flashed systemd image entered emergency mode because WIC
+generated `/dev/mmcblkp1` for the `/boot` fstab entry, while Linux exposed the SD
+as `/dev/mmcblk1`. The shared WKS now requests `--use-uuid` for the boot
+partition, as it already does for root. Rebuild the image to include this fix;
+existing exported images retain the defective fstab.
+
+The installed SD was repaired in place using its FAT filesystem UUID in fstab
+(with the original saved as `/etc/fstab.before-boot-fix`). After a reboot,
+systemd reported `running`, no failed units, a mounted `/boot`, successful
+three-frame camera startup and active split HDMI preview. A bounded 60-frame
+native inference run completed and preview returned to camera-only mode.
+That SD does not need reflashing for this fix. Kernel stream-transition and
+older-QSPI pinctrl warnings remain; this is not a warning-free boot.
+
+The rootfs check validates HDMI enablement links without following their absolute
+Linux paths on the build host. It also checks that their unit targets exist
+inside the image and that ML inference remains manually controlled. Regression
+tests for this policy can run in the Linux builder:
+
+```powershell
+docker compose run --rm -v D:/Github/FaceGuard/kv260-yunet:/yunet:ro builder python3 /project/scripts/test-vision-boot-policy.py --model /yunet/runtime/model/yunet_smartcam.xmodel
+```
