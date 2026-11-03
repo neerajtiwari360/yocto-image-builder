@@ -4,6 +4,15 @@ One reusable Linux Docker environment, with explicit configurations for each dev
 Docker contains PC build tools; Yocto recipes select the software installed on a device.
 Python and Git in the builder do not automatically go into a device image.
 
+For **live J7 camera video and ML face detection over HDMI**, follow the
+`kv260-vision-hdmi` commands below. The target name in the command selects the
+image contents; the builder does not automatically choose the camera image.
+
+| Target | What the SD image provides |
+| --- | --- |
+| `kv260-vision-hdmi` | J7 camera, YuNet ML and HDMI preview; camera starts at boot, ML starts manually |
+| `kv260-vision-minimal` | J7 camera and ML runtime, operated through the console without HDMI preview |
+
 ## 1. Prepare the foundation (no device required)
 
 From PowerShell at the repository root, with Docker Desktop in Linux container mode:
@@ -17,29 +26,46 @@ This validates tools, Linux filesystem behavior and non-root compilation and cre
 workspace directories. It does not fetch a BSP or generate a device image.
 The existing `yocto-foundation-workspace` volume is retained.
 
-## 2. Xilinx Kria KV260 image
+## 2. KV260 camera, ML and HDMI image
 
-The `kv260-hcsr04-minimal` target builds a minimal console image
-for the Kria KV260, with loopback-only networking and a persistent `/opt/projects`
-workspace. No package manager or compiler is installed. Cross-compile applications
-on the PC and transfer over UART serial, or include them in the image at build time.
-HC-SR04 software and firmware are not preinstalled.
-The historical target name is retained for existing build commands; see
-[the build, first-boot and project-saving guide](docs/kv260-hcsr04-minimal.md).
+Use `kv260-vision-hdmi` for the J7 AR1335/AP1302 camera, SmartCam B3136 FPGA
+firmware, YuNet face detection and HDMI display. See the
+[HDMI build and boot guide](docs/kv260-vision-hdmi.md) for hardware details and diagnostics.
 
-## 3. Prepare, build and export a selected target
+## 3. Prepare, build and export the HDMI image
 
 ```powershell
-docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal prepare
-docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal parse
-docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal build
-docker compose run --rm builder bash /project/scripts/image.sh kv260-hcsr04-minimal export
+docker compose run --rm builder bash /project/scripts/image.sh kv260-vision-hdmi prepare
+docker compose run --rm builder bash /project/scripts/image.sh kv260-vision-hdmi parse
+docker compose run --rm builder bash /project/scripts/image.sh kv260-vision-hdmi build
 ```
 
 `prepare` fetches exact locked sources and configures the target; `parse` checks metadata;
 `build` produces the device OS, exports it and saves a checksum-verified copy to your local artifacts folder. `export` repeats export without rebuilding.
 Exports are in `/work/exports/<release>/<target>/<tag>-<UTC timestamp>/`.
 Local files are saved automatically to `artifacts/<release>/<target>/<version>/` in this checkout. No docker cp is needed.
+
+Flash **`kv260-vision-hdmi.img`** from the newest timestamped folder under
+`artifacts/scarthgap-kv260/kv260-vision-hdmi/`. Choose the newest export within
+this target, since other target folders contain different images.
+Flashing replaces the SD card contents.
+
+After boot, camera-only HDMI preview starts automatically. Log in as `root`
+through PuTTY (115200 baud, 8N1, no flow control), then run these commands
+**on the board**:
+
+```sh
+systemctl start yunet-inference   # enable ML face boxes and five landmarks
+systemctl stop yunet-inference    # return to camera-only preview
+```
+
+ML starts manually after each reboot. To inspect startup problems, run:
+
+```sh
+systemctl status kv260-vision yunet-hdmi yunet-inference --no-pager -l
+journalctl -b -u kv260-vision -u yunet-hdmi -u yunet-inference --no-pager -n 100
+```
+
 
 ## Repository layout
 

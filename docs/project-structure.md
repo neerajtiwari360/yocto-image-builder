@@ -25,9 +25,7 @@ Do not edit the generated copies. Local layers are isolated per release and targ
 The runner preserves the existing volume, upstream sources, builds and caches. Local layers are synchronized into the isolated path for the selected target.
 
 The KV260 target uses the meta-kv260 layer for its hardware configuration,
-offline console image and optional project workspace.
-The historical `hcsr04` target/machine/recipe names are retained for compatibility;
-they do not mean the image still contains sensor software.
+shared SD boot configuration and optional project workspace. The vision targets use the shared kv260-base configuration.
 
 ## Adding another board
 

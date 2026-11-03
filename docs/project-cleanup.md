@@ -20,9 +20,16 @@ Root requirements now describe optional NumPy support for laptop NPZ evaluation.
 Yocto layers/targets, source-release pins, flashable images, deployable packages,
 model-conversion archives and board/migration validation evidence.
 
-The historical `kv260-hcsr04` machine/target names are retained: the vision
-machine requires that machine configuration. They are not disposable HC-SR04
-sensor application code. Kernel, firmware, device trees and BSP source remain.
+On 2026-11-03, the obsolete console target was removed and shared board metadata was renamed to kv260-base. Vision targets retain the required kernel, firmware, device trees and SD boot settings.
+
+The user ran a full `kv260-vision-hdmi build` after this cleanup. All 4,450
+tasks succeeded, with seven warnings, and SD image structural verification
+passed. The generated release is `yocto-5.0.19-20261103T153821443693252Z`.
+Hardware boot of that release remains unverified.
+Old exported layer snapshots were removed locally; retained image binaries and
+their original checksum entries were preserved. Each affected export includes
+a `SOURCE-SNAPSHOT-REMOVED.txt` note, and its checksum list covers the retained
+original files. Generated artifacts are excluded from Git.
 
 ## Archived content
 
@@ -31,7 +38,7 @@ sensor application code. Kernel, firmware, device trees and BSP source remain.
 - Their models, datasets, DVC metadata/cache, MLflow experiments/database and
   reports, preserved in the archive under their original relative paths.
 - Python package-download cache and generated serial-transfer spool.
-- Builder's HC-SR04 sensor experiments, obsolete patch-generation/debugging
+- Builder's retired sensor experiments, obsolete patch-generation/debugging
   helpers, superseded build logs and one-time migration editing scripts.
 - Backups of FaceGuard's original README, requirements and editor settings.
 
