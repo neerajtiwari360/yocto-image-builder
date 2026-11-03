@@ -1,5 +1,10 @@
 # Optional KV260 offline HDMI preview image
 
+To change an application on an already booted board, follow
+[build on the PC and update the KV260](kv260-update-software.md).
+It separates laptop cross-compilation/UART transfer from board service commands
+and explains when a full platform rebuild is required.
+
 `kv260-vision-hdmi` uses the same source locks, machine, kernel, camera, B3136 DPU
 and model as `kv260-vision-minimal`. It adds systemd and the optional `kv260-yunet-hdmi`
 package. The original headless target retains SysV init. No FPGA or device-tree

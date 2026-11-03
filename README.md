@@ -67,6 +67,14 @@ journalctl -b -u kv260-vision -u yunet-hdmi -u yunet-inference --no-pager -n 100
 ```
 
 
+## 4. Compile and transfer application updates to a running board
+
+Follow [build on the PC and update the KV260](docs/kv260-update-software.md)
+for the exact PowerShell and board commands to cross-compile ML/HDMI components,
+transfer them over UART, restart services, verify results and roll back.
+It also covers model compatibility, driver/platform rebuilds and including
+validated application changes in future SD images.
+
 ## Repository layout
 
 | Path | Purpose |
